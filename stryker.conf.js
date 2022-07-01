@@ -8,12 +8,9 @@ module.exports = function(config) {
     testFramework: "mocha",
     coverageAnalysis: "perTestInIsolation",
     mochaOptions:{
-      spec: ['domain/*.spec.js']
+      spec: ['tests/*.spec.js']
     },
-    mutate: ['domain/*.js',
-      '!domain/*.spec.js',
-      '!domain/*.port.js',
-      '!domain/*.factory.js'],
+    mutate: ['index.js'],
     maxConcurrentTestRunners: 2
   });
 };
