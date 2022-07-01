@@ -3,7 +3,9 @@
   "version": "1.1.1",
   "description": "New application schema",
   "main": "index.js",
-  "dependencies": {},
+  "dependencies": {
+    "allcombinations": "^1.1.5"
+  },
   "devDependencies": {
     "@stryker-mutator/core": "^2.5.0",
     "@stryker-mutator/javascript-mutator": "^2.5.0",
@@ -16,7 +18,7 @@
   },
   "scripts": {
     "release": "release-it",
-    "test": "npm run test-mocha && npm run test-cucumber",
+    "test": "mocha tests && npm run test-mutation",
     "test-mocha": "npm run test-doubles && npm run test-domain && npm run test-adapters && npm run test-integration && npm run test-mutation",
     "test-domain": "mocha domain --recursive",
     "test-doubles": "mocha test-doubles --recursive",
