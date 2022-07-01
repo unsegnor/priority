@@ -1,6 +1,6 @@
 {
   "name": "prioritizer",
-  "version": "1.1.8",
+  "version": "1.1.9",
   "description": "Method to prioritize a list",
   "main": "index.js",
   "devDependencies": {
