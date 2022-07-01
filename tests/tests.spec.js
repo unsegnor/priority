@@ -24,6 +24,13 @@ describe('PrioritizedList', function(){
         expect(list.toArray()).to.deep.equal(expectedOutput)
     }
 
+    async function checkAllCombinations(input){
+        var combinations = allcombinations(input)
+        for (var combination of combinations) {
+            list = await Priority.createPrioritizedList(greater)
+            await checkOrder(combination,input)
+        }
+    }
     it('should be empty', async function(){
         expect(list.toArray()).to.deep.equal([])
     })
@@ -42,27 +49,15 @@ describe('PrioritizedList', function(){
     })
 
     it('checking lists of 3 elements', async function(){
-        var combinations = allcombinations([3,2,1])
-        for (var combination of combinations) {
-            list = await Priority.createPrioritizedList(greater)
-            await checkOrder(combination,[3,2,1])
-        }
+        await checkAllCombinations([3,2,1])
     })
 
     it('checking lists of 4 elements', async function(){
-        var combinations = allcombinations([4,3,2,1])
-        for (var combination of combinations) {
-            list = await Priority.createPrioritizedList(greater)
-            await checkOrder(combination,[4,3,2,1])
-        }
+        await checkAllCombinations([4,3,2,1])
     })
 
     it('checking lists of 5 elements', async function(){
-        var combinations = allcombinations([5,4,3,2,1])
-        for (var combination of combinations) {
-            list = await Priority.createPrioritizedList(greater)
-            await checkOrder(combination,[5,4,3,2,1])
-        }
+        await checkAllCombinations([5,4,3,2,1])
     })
 
     it('checking lists of 5 elements should not make more than log(n) comparisons', async function(){
@@ -77,5 +72,15 @@ describe('PrioritizedList', function(){
         expect(comparisons).to.be.lessThan(maximumComparisons)
     })
 
-    it('when some objects are equal')
+    it('checking lists of 4 elements when middle ones are equal', async function(){
+        await checkAllCombinations([4,3,3,1])
+    })
+
+    it('checking lists of 4 elements when greater ones are equal', async function(){
+        await checkAllCombinations([4,4,3,1])
+    })
+
+    it('checking lists of 4 elements when smaller ones are equal', async function(){
+        await checkAllCombinations([4,3,1,1])
+    })
 })
