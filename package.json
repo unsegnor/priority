@@ -13,7 +13,7 @@
     "@stryker-mutator/mocha-runner": "^2.5.0",
     "chai": "^4.2.0",
     "cucumber": "^6.0.0",
-    "mocha": "^7.2.0",
+    "mocha": "^10.0.0",
     "allcombinations": "^1.1.5"
   },
   "scripts": {
