@@ -1,5 +1,4 @@
-module.exports = function(config) {
-  config.set({
+module.exports = {
     mutator: "javascript",
     packageManager: "npm",
     reporters: ["clear-text", "progress"],
@@ -12,5 +11,4 @@ module.exports = function(config) {
     },
     mutate: ['index.js'],
     maxConcurrentTestRunners: 2
-  });
 };
