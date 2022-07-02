@@ -5,12 +5,11 @@ const rl = readline.createInterface({
   output: process.stdout
 });
 
-var list;
+let list;
 
 async function compareWhichIsMoreImportant(task1, task2){
-    console.log("vamos a comparar")
     return new Promise(function(accept){
-        rl.question(`What would yo do first?  ${task1}(1) or ${task2}(2) `, function (selection) {
+        rl.question(`What should go first?  ${task1}(1) or ${task2}(2) `, function (selection) {
             if(selection == 1) accept(task1)
             else if(selection == 2) accept(task2)
             else accept()
@@ -19,22 +18,23 @@ async function compareWhichIsMoreImportant(task1, task2){
 }
 
 rl.on('close', function () {
-  console.log('Bye!');
+  console.log('This is your prioritized list:');
+  console.log(list.toArray());
   process.exit(0);
 });
 
 async function init(){
     list = await Priority.createPrioritizedList(compareWhichIsMoreImportant)
-    var goOn = true;
-    while(goOn){
-        goOn = await question()
-        console.log(await list.toArray())
+    let go_on = await question(true);
+    while(go_on){
+        go_on = await question()
+        console.log(list.toArray())
     }
 }
 
-async function question(){
+async function question(isFirst){
     return new Promise(function(accept){
-        rl.question('What do you have to do? ', async function (task) {
+        rl.question( isFirst?'Is there anything you want to add to the list? ' : 'Anything else to add to the list? ', async function (task) {
             if(task == ""){
                 rl.close();
                 accept(false)
