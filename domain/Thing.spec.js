@@ -3,8 +3,8 @@ const Thing = require('./Thing')
 
 describe('Thing', function(){
     it('must do stuff', async function(){
-        var thing = Thing()
-        var result = await thing.doStuff()
+        let thing = Thing()
+        let result = await thing.doStuff()
         expect(result).to.equal('stuff done')
     })
 })

@@ -4,7 +4,7 @@ const allcombinations = require('allcombinations');
 
 describe('PrioritizedList', function(){
 
-    var greater, list, comparisons
+    let greater, list, comparisons
 
     this.beforeEach(async function(){
         comparisons = 0
@@ -13,20 +13,19 @@ describe('PrioritizedList', function(){
             comparisons++
             if (item1 > item2) return item1;
             if (item2 > item1) return item2;
-            return;
         }
 
         list = await Priority.createPrioritizedList(greater)
     })
 
     async function checkOrder(input, expectedOutput){
-        for(var element of input) await list.add(element)
+        for(let element of input) await list.add(element)
         expect(list.toArray()).to.deep.equal(expectedOutput)
     }
 
     async function checkAllCombinations(input){
-        var combinations = allcombinations(input)
-        for (var combination of combinations) {
+        let combinations = allcombinations(input)
+        for (let combination of combinations) {
             list = await Priority.createPrioritizedList(greater)
             await checkOrder(combination,input)
         }
@@ -61,9 +60,9 @@ describe('PrioritizedList', function(){
     })
 
     it('checking lists of 5 elements should not make more than log(n) comparisons', async function(){
-        var combinations = allcombinations([5,4,3,2,1])
-        var maximumComparisons = 0
-        for (var combination of combinations) {
+        let combinations = allcombinations([5,4,3,2,1])
+        let maximumComparisons = 0
+        for (let combination of combinations) {
             list = await Priority.createPrioritizedList(greater)
             maximumComparisons+=Math.ceil(Math.log2(5))+Math.ceil(Math.log2(4))+Math.ceil(Math.log2(3))+Math.ceil(Math.log2(2))
             await checkOrder(combination,[5,4,3,2,1])

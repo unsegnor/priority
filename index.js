@@ -6,10 +6,10 @@ module.exports = {
         }
 
         async function getPositionToInsert(item){
-            var list_start = 0
-            var list_end = items.length
+            let list_start = 0
+            let list_end = items.length
             while (list_start < list_end){
-                var middle_position = Math.floor((list_start + list_end)/2)
+                let middle_position = Math.floor((list_start + list_end)/2)
                 if (await greater(item, items[middle_position]) == item) list_end = middle_position
                 else list_start = middle_position +1
             }
@@ -23,7 +23,7 @@ module.exports = {
             add: async function(item){
                 if(items.length == 0) items.push(item)
                 else{
-                    var position = await getPositionToInsert(item)
+                    let position = await getPositionToInsert(item)
                     arrayInsert(items, item, position)
                 }
             }
