@@ -7,14 +7,14 @@ const listName = "test-list"
 describe('PersistentPrioritizedList', function(){
     beforeEach(async function(){
         this.CreateList = async function(greater){
-            return await Priority.getPersistentPrioritizedList(greater, listName, TestRepository())
+            return Priority.getPersistentPrioritizedList(greater, listName, TestRepository())
         }
     })
 
     prioritizedListTests()
 
     it('recovering the list by name', async function(){
-        greater = async function(item1, item2){
+        let greater = async function(item1, item2){
             if (item1 > item2) return item1;
             if (item2 > item1) return item2;
         }
