@@ -29,19 +29,15 @@ module.exports = {
 
     getPersistentPrioritizedList: async function(greater, name, state){
         let app = await state.getRoot(name)
-        let items = await app.get('items')
+        let items = await app.get('items') || []
 
         return {
             add: async function(item){
-                if (!items) await app.add('items', item)
-                else{
-                    let position = await getPositionToInsert(item, items, greater)
-                    arrayInsert(items, item, position)
-                }
-                items = await app.get('items')
+                let position = await getPositionToInsert(item, items, greater)
+                arrayInsert(items, item, position)
+                await app.set('items', items)
             },
             toArray: async function(){
-                if(items == undefined) return []
                 return items
             }
         }
