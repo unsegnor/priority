@@ -17,9 +17,9 @@ async function compareWhichIsMoreImportant(task1, task2){
     })
 }
 
-rl.on('close', function () {
+rl.on('close', async function () {
   console.log('This is your prioritized list:');
-  console.log(list.toArray());
+  console.log(await list.toArray());
   process.exit(0);
 });
 
@@ -28,7 +28,7 @@ async function init(){
     let go_on = await question(true);
     while(go_on){
         go_on = await question()
-        console.log(list.toArray())
+        console.log(await list.toArray())
     }
 }
 

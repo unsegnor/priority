@@ -43,5 +43,8 @@
   "bugs": {
     "url": "https://github.com/unsegnor/priority/issues"
   },
-  "homepage": "https://github.com/unsegnor/priority#readme"
+  "homepage": "https://github.com/unsegnor/priority#readme",
+  "dependencies": {
+    "persistent-programming": "^3.1.24"
+  }
 }
