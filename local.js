@@ -1,7 +1,8 @@
+
 const consoleApp = require('./consoleApp')
 
 async function init(){
-    consoleApp()
+    consoleApp(true)
 }
 
 init()
