@@ -11,10 +11,10 @@
     "@stryker-mutator/javascript-mutator": "^2.5.0",
     "@stryker-mutator/mocha-framework": "^4.0.0",
     "@stryker-mutator/mocha-runner": "^2.5.0",
+    "allcombinations": "^1.1.5",
     "chai": "^4.2.0",
     "cucumber": "^6.0.0",
-    "mocha": "^10.0.0",
-    "allcombinations": "^1.1.5"
+    "mocha": "^10.0.0"
   },
   "scripts": {
     "test": "mocha tests && npm run test-mutation",
@@ -45,6 +45,9 @@
   },
   "homepage": "https://github.com/unsegnor/priority#readme",
   "dependencies": {
+    "dotenv": "^16.0.1",
+    "node-persist": "^3.1.0",
+    "node-telegram-bot-api": "^0.58.0",
     "persistent-programming": "^3.1.24",
     "persistent-programming-redis-state": "^3.0.19"
   }
