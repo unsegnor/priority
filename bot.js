@@ -31,7 +31,7 @@ bot.on('message', async (msg) => {
 
   console.log(msg.text)
 
-  list = await Priority.getPersistentPrioritizedList(compareWhichIsMoreImportant.bind(undefined, chatId), chatId, RedisState({databaseId:1}))
+  let list = await Priority.getPersistentPrioritizedList(compareWhichIsMoreImportant.bind(undefined, chatId), chatId, RedisState({databaseId:1}))
   await list.add(msg.text)
 
   let tasks = await list.toArray()
