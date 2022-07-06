@@ -1,10 +1,10 @@
-const Priority = require("../index.js")
+const PrioritizedList = require("../domain/PrioritizedList.js")
 const prioritizedListTests = require("./prioritizedListTests.js")
 
 describe('InMemoryPrioritizedList', function(){
     beforeEach(async function(){
         this.CreateList = async function(greater){
-            return Priority.createPrioritizedList(greater)
+            return PrioritizedList.createPrioritizedList(greater)
         }
     })
 

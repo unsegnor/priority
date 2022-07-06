@@ -9,6 +9,9 @@ module.exports = {
     mochaOptions:{
       spec: ['tests/*.spec.js']
     },
-    mutate: ['index.js'],
+    mutate: [
+      'index.js',
+      'domain/**/*.js'
+    ],
     maxConcurrentTestRunners: 2
 };

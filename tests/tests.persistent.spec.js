@@ -1,4 +1,4 @@
-const Priority = require("../index.js")
+const PrioritizedList = require("../domain/PrioritizedList")
 const prioritizedListTests = require("./prioritizedListTests.js")
 const {TestRepository} = require('persistent-programming')
 const { expect } = require("chai")
@@ -7,7 +7,7 @@ const listName = "test-list"
 describe('PersistentPrioritizedList', function(){
     beforeEach(async function(){
         this.CreateList = async function(greater){
-            return Priority.getPersistentPrioritizedList(greater, listName, TestRepository())
+            return PrioritizedList.getPersistentPrioritizedList(greater, listName, TestRepository())
         }
     })
 
@@ -24,7 +24,7 @@ describe('PersistentPrioritizedList', function(){
     
             repository = TestRepository()
     
-            let list = await Priority.getPersistentPrioritizedList(greater, listName, repository)
+            let list = await PrioritizedList.getPersistentPrioritizedList(greater, listName, repository)
     
             await list.add('1')
             await list.add('2')
@@ -32,13 +32,13 @@ describe('PersistentPrioritizedList', function(){
         })
 
         it('recovering the list by name', async function(){
-            let recoveredList = await Priority.getPersistentPrioritizedList(greater, listName, repository)
+            let recoveredList = await PrioritizedList.getPersistentPrioritizedList(greater, listName, repository)
             let array = await recoveredList.toArray()
             expect(array).to.deep.equal(['3','2','1'])
         })
     
         it('a list with a different name should be different', async function(){
-            let recoveredList = await Priority.getPersistentPrioritizedList(greater, "differentName", repository)
+            let recoveredList = await PrioritizedList.getPersistentPrioritizedList(greater, "differentName", repository)
             let array = await recoveredList.toArray()
             expect(array).to.deep.equal([])
         })
