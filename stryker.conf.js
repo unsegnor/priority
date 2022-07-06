@@ -1,11 +1,8 @@
 module.exports = {
-    mutator: "javascript",
     packageManager: "npm",
     reporters: ["clear-text", "progress"],
     testRunner: "mocha",
-    transpilers: [],
-    testFramework: "mocha",
-    coverageAnalysis: "perTestInIsolation",
+    coverageAnalysis: "perTest",
     mochaOptions:{
       spec: ['tests/*.spec.js']
     },
