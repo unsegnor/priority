@@ -12,7 +12,7 @@ const bot = new TelegramBot(token, {polling: true});
 
 bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
-  if(msg.text == '/status') {
+  if(msg.text == '/version') {
     bot.sendMessage(chatId, packageJson.version)
     return
   }
