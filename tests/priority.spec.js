@@ -39,17 +39,4 @@ describe('priority tests', function(){
         expect(tasks.length).to.equal(2)
         expect(tasks[0]).to.equal('2 fix the car')
     })
-
-    it('should ask for the status of the first task', async function(){
-        let user = await prioritizer.getUser({
-            id: '2',
-            greaterFunction
-        })
-        await user.addTask('1 go shopping')
-        await user.addTask('2 fix the car')
-        let tasks = await user.getTasks()
-
-        expect(tasks.length).to.equal(2)
-        expect(tasks[0]).to.equal('2 fix the car')
-    })
 })

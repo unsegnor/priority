@@ -8,7 +8,7 @@ module.exports = {
                 await list.add(task)
             },
             getTasks: async function(){
-                return await list.toArray()
+                return list.toArray()
             }
         }
     }
