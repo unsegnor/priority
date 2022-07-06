@@ -1,6 +1,6 @@
 {
   "name": "prioritizer",
-  "version": "1.2.4",
+  "version": "1.2.5",
   "description": "Method to prioritize a list with persistence",
   "main": "index.js",
   "engines": {
