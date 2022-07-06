@@ -2,6 +2,7 @@ process.env.NTBA_FIX_319 = true
 const TelegramBot = require('node-telegram-bot-api');
 const dotenv = require("dotenv")
 dotenv.config()
+const packageJson = require('./package.json')
 const RedisState = require('persistent-programming-redis-state')
 const Priority = require("./index.js")
 
@@ -11,6 +12,10 @@ const bot = new TelegramBot(token, {polling: true});
 
 bot.on('message', async (msg) => {
   const chatId = msg.chat.id;
+  if(msg.text == '/status') {
+    bot.sendMessage(chatId, packageJson.version)
+    return
+  }
   if(msg.text[0] == '/') return
 
   let list = await Priority.getPersistentPrioritizedList(compareWhichIsMoreImportant.bind(undefined, chatId), chatId, RedisState({databaseId:1}))
