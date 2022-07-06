@@ -1,5 +1,4 @@
 const { expect } = require("chai")
-const Priority = require("../index.js")
 const allcombinations = require('allcombinations');
 
 module.exports = function(){
