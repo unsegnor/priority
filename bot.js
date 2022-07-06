@@ -17,7 +17,7 @@ bot.on('message', async (msg) => {
   await list.add(msg.text)
 
   let tasks = await list.toArray()
-  let tasksString = "Tu lista ordenada: \n\n"
+  let tasksString = "Esta es tu lista ordenada: \n\n"
   for(let task of tasks){
     tasksString += task + "\n"
   }
