@@ -3,8 +3,11 @@ const TelegramBot = require('node-telegram-bot-api');
 const dotenv = require("dotenv")
 dotenv.config()
 const packageJson = require('./package.json')
-const RedisState = require('persistent-programming-redis-state')
-const Priority = require("./index.js")
+const RedisRepository = require('persistent-programming-redis-state')
+const Prioritizer = require("./index.js")
+const { nanoid } = require('nanoid');
+
+const prioritizer = Prioritizer.createNew(RedisRepository({databaseId:1}))
 
 const token = process.env.TELEGRAM_BOT_TOKEN;
 
@@ -18,10 +21,14 @@ bot.on('message', async (msg) => {
   }
   if(msg.text[0] == '/') return
 
-  let list = await Priority.getPersistentPrioritizedList(compareWhichIsMoreImportant.bind(undefined, chatId), chatId, RedisState({databaseId:1}))
-  await list.add(msg.text)
+  let user = await prioritizer.getUser({
+    id: chatId,
+    greaterFunction: compareWhichIsMoreImportant.bind(undefined, chatId)
+  })
 
-  let tasks = await list.toArray()
+  await user.addTask(msg.text)
+
+  let tasks = await user.getTasks()
   let tasksString = "Esta es tu lista ordenada: \n\n"
   for(let task of tasks){
     tasksString += task + "\n"
@@ -33,12 +40,14 @@ bot.on('message', async (msg) => {
 async function compareWhichIsMoreImportant(chatId, task1, task2){
 
   return new Promise(function(accept){
+    let query_id = nanoid();
     let responseHanndler = async (query)=>{
-      const receivedChatId = query.message.chat.id
-      const response = query.data
+      const data = JSON.parse(query.data)
+      const receivedQueryId = data.query_id
+      const response = data.response
     
-      if(receivedChatId == chatId){
-        bot.off('callback_query', responseHanndler) //dejamos de escuchar respuestas ya tenemos la nuestra
+      if(receivedQueryId == query_id){
+        bot.off('callback_query', responseHanndler)
 
         if(response == 1) accept(task1)
         if(response == 2) accept(task2)
@@ -50,8 +59,8 @@ async function compareWhichIsMoreImportant(chatId, task1, task2){
     bot.sendMessage(chatId, `¿Cuál va primero?`, {
       reply_markup: {
         inline_keyboard: [[
-          {text: task1, callback_data: 1},
-          {text: task2, callback_data: 2}
+          {text: task1, callback_data: JSON.stringify({query_id, response: 1})},
+          {text: task2, callback_data: JSON.stringify({query_id, response: 2})}
         ]]
       }
     })
