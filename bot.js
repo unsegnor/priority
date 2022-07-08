@@ -58,10 +58,10 @@ async function compareWhichIsMoreImportant(chatId, task1, task2){
     bot.on('callback_query', responseHanndler)
     bot.sendMessage(chatId, `¿Cuál va primero?`, {
       reply_markup: {
-        inline_keyboard: [[
-          {text: task1, callback_data: JSON.stringify({query_id, response: 1})},
-          {text: task2, callback_data: JSON.stringify({query_id, response: 2})}
-        ]]
+        inline_keyboard: [
+          [{text: task1, callback_data: JSON.stringify({query_id, response: 1})}],
+          [{text: task2, callback_data: JSON.stringify({query_id, response: 2})}]
+        ]
       }
     })
   })
