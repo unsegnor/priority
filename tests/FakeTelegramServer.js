@@ -6,17 +6,10 @@ module.exports = function(){
 
     return {
         start: async function(){
-            return new Promise(async function(accept){
-                let serverConfig = {port: 9001}
-                server = new TelegramServer(serverConfig);
-                // server.start().then(() => {
-                //     client = server.getClient("sampleToken");
-                //     accept()
-                //   });
-                await server.start()
-                client = server.getClient(token)
-                accept()
-            })
+            let serverConfig = {port: 9001}
+            server = new TelegramServer(serverConfig);
+            await server.start()
+            client = server.getClient(token)
         },
         getUrl: function(){
             return server.config.apiURL

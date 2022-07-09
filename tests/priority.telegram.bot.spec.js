@@ -18,20 +18,12 @@ describe('Telegram bot tests', function(){
         await bot.start()
 
         this.getUser = async function(id, greaterFunction){
-            let user = await TelegramBotTestUser({
+            return await TelegramBotTestUser({
                 client: telegramServer.getClient(),
-                id,
                 greaterFunction
             })
-            return user
         }
     })
-
-    async function wait(time){
-        return new Promise(function(accept){
-            setTimeout(accept,time)
-        })
-    }
 
     afterEach(async function(){
         await bot.stop()

@@ -1,4 +1,4 @@
-module.exports = async function({client, id, greaterFunction}){
+module.exports = async function({client, greaterFunction}){
     async function startBot(){
         sendMessage('/start');
     }
@@ -16,9 +16,8 @@ module.exports = async function({client, id, greaterFunction}){
 
     async function waitResponse(){
         const updates = await client.getUpdates();
-            if(updates.result.length > 1) throw "We were expecting one message but got more"
-            let response = updates.result[0].message
-            return response
+        if(updates.result.length > 1) throw new Error("We were expecting one message but got more")
+        return updates.result[0].message
     }
 
     let tasksList = []
