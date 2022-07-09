@@ -1,0 +1,19 @@
+{
+  message_id: 186,
+  from: {
+    id: 11006119,
+    is_bot: false,
+    first_name: 'Víctor',
+    last_name: 'Calatayud Asensio',
+    language_code: 'es'
+  },
+  chat: {
+    id: 11006119,
+    first_name: 'Víctor',
+    last_name: 'Calatayud Asensio',
+    type: 'private'
+  },
+  date: 1657379132,
+  text: '/version',
+  entities: [ { offset: 0, length: 8, type: 'bot_command' } ]
+}
