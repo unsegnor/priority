@@ -10,9 +10,9 @@ describe('Logic tests', function(){
     beforeEach(function(){
         prioritizer = Prioritizer.createNew(TestRepository())
 
-        this.getUser = async function(id, greaterFunction){
-            return await prioritizer.getUser({
-                id,
+        this.getUser = async function(greaterFunction){
+            return prioritizer.getUser({
+                id:'1',
                 greaterFunction
             })
         }

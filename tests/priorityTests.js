@@ -9,7 +9,7 @@ module.exports = function(){
                 if (task1 > task2) return task1;
                 if (task2 > task1) return task2;
             }
-            user = await this.getUser('1', greaterFunction)
+            user = await this.getUser(greaterFunction)
         })
 
         it('introducing a task', async function(){
