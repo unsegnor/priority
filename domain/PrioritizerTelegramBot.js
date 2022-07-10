@@ -68,12 +68,12 @@ module.exports = {
               }
           
               bot.on('callback_query', responseHanndler)
-              bot.sendMessage(chatId, `¿Has terminado de ${task}?`, {
+              bot.sendMessage(chatId, `¿Has terminado ${task}?`, {
                 reply_markup: {
-                  inline_keyboard: [
-                    [{text: "Sí!", callback_data: JSON.stringify({query_id, response: 1})}],
-                    [{text: "Aún no...", callback_data: JSON.stringify({query_id, response: 2})}]
-                  ]
+                  inline_keyboard: [[
+                    {text: "Sí", callback_data: JSON.stringify({query_id, response: 1})},
+                    {text: "Aún no...", callback_data: JSON.stringify({query_id, response: 2})}
+                  ]]
                 }
               })
             })

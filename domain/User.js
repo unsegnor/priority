@@ -18,14 +18,12 @@ module.exports = {
         }
 
         async function completeTask(){
-            console.log("completar tarea")
             let tasks = await getTasks()
             let selectedTask = undefined
             let currentTask = 0
             while(!selectedTask && currentTask < tasks.length){
                 if(await selectFunction(tasks[currentTask])){
                     selectedTask = tasks[currentTask]
-                    console.log("selected task", selectedTask)
                     await list.remove(selectedTask)
                     break
                 }

@@ -62,7 +62,7 @@ module.exports = async function({client, greaterFunction, selectFunction}){
                     let options = response.reply_markup.inline_keyboard
                     let selectedOption
                     if(await selectFunction(response.text)) selectedOption = options[0][0]
-                    else selectedOption = options[1][0]
+                    else selectedOption = options[0][1]
                     const callback = client.makeCallbackQuery(selectedOption.callback_data);
                     await client.sendCallback(callback);
                 }
