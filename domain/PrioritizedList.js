@@ -13,6 +13,10 @@ function arrayInsert(array, item, position){
     array.splice(position, 0, item)
 }
 
+function arrayRemove(array, position){
+    array.splice(position, 1)
+}
+
 module.exports = {
     createPrioritizedList: async function (greater){
         let items = []
@@ -39,6 +43,11 @@ module.exports = {
             },
             toArray: async function(){
                 return items
+            },
+            remove: async function(item){
+                let position = items.indexOf(item)
+                arrayRemove(items, position)
+                await app.set('items', items)
             }
         }
     }

@@ -17,10 +17,11 @@ describe('Telegram bot tests', function(){
         bot.setTelegramServerURL(telegramServer.getUrl())
         await bot.start()
 
-        this.getUser = async function(greaterFunction){
+        this.getUser = async function(greaterFunction, selectFunction){
             return TelegramBotTestUser({
                 client: telegramServer.getClient(),
-                greaterFunction
+                greaterFunction,
+                selectFunction
             })
         }
     })
