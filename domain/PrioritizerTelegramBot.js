@@ -50,6 +50,35 @@ module.exports = {
             })
           }
 
+          async function selectTask(chatId, task){
+            return new Promise(function(accept){
+              let query_id = nanoid();
+              let responseHanndler = async (query)=>{
+                const data = JSON.parse(query.data)
+                const receivedQueryId = data.query_id
+                const response = data.response
+              
+                if(receivedQueryId == query_id){
+                  bot.off('callback_query', responseHanndler)
+          
+                  if(response == 1) accept(true)
+                  if(response == 2) accept(false)
+                  accept()
+                }
+              }
+          
+              bot.on('callback_query', responseHanndler)
+              bot.sendMessage(chatId, `¿Has terminado ${task}?`, {
+                reply_markup: {
+                  inline_keyboard: [[
+                    {text: "Sí", callback_data: JSON.stringify({query_id, response: 1})},
+                    {text: "Aún no...", callback_data: JSON.stringify({query_id, response: 2})}
+                  ]]
+                }
+              })
+            })
+          }
+
         async function start(){
             const botOptions = {polling: true, baseApiUrl: serverUrl};
             bot = new TelegramBot(token, botOptions);
@@ -61,22 +90,27 @@ module.exports = {
                     return
                 }
 
-                if(msg.text[0] == '/') return
+                if(msg.text == '/start') return
                 
                 let user = await prioritizer.getUser({
                     id: chatId,
-                    greaterFunction: compareWhichTaskIsMoreImportant.bind(undefined, chatId)
+                    greaterFunction: compareWhichTaskIsMoreImportant.bind(undefined, chatId),
+                    selectFunction: selectTask.bind(undefined, chatId)
                   })
                 
+                if(msg.text == '/completar'){
+                  await user.completeTask()
+                }else{
                   await user.addTask(msg.text)
+                }
                 
-                  let tasks = await user.getTasks()
-                  let tasksString = "Esta es tu lista ordenada: \n\n"
-                  for(let task of tasks){
-                    tasksString += task + "\n"
-                  }
-                
-                  bot.sendMessage(chatId, tasksString);
+                let tasks = await user.getTasks()
+                let tasksString = "Esta es tu lista ordenada: \n\n"
+                for(let task of tasks){
+                  tasksString += task + "\n"
+                }
+              
+                bot.sendMessage(chatId, tasksString);
               });
         }
     }
