@@ -72,7 +72,7 @@ module.exports = {
                 reply_markup: {
                   inline_keyboard: [[
                     {text: "Sí", callback_data: JSON.stringify({query_id, response: 1})},
-                    {text: "Aún no...", callback_data: JSON.stringify({query_id, response: 2})}
+                    {text: "No", callback_data: JSON.stringify({query_id, response: 2})}
                   ]]
                 }
               })
