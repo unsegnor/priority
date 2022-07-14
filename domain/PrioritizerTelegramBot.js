@@ -85,12 +85,12 @@ module.exports = {
 
             bot.on('message', async (msg) => {
                 const chatId = msg.chat.id;
-                if(msg.text == '/version') {
+                if(msg.text.startsWith('/version')) {
                     bot.sendMessage(chatId, packageJson.version)
                     return
                 }
 
-                if(msg.text == '/start') return
+                if(msg.text.startsWith('/start')) return
                 
                 let user = await prioritizer.getUser({
                     id: chatId,
@@ -98,7 +98,7 @@ module.exports = {
                     selectFunction: selectTask.bind(undefined, chatId)
                   })
                 
-                if(msg.text == '/completar'){
+                if(msg.text.startsWith('/completar')){
                   await user.completeTask()
                 }else{
                   await user.addTask(msg.text)
