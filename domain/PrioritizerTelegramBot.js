@@ -110,6 +110,23 @@ module.exports = {
 //que luego se puedan ejecutar
 
 //quizá el mecanismo de los eventos deba estar más integrado en persistent programming
+//tenemos que hacer un persisten-event-manager?
+//de modo que si se establece una suscripción a un evento de un objeto
+//entonces el código de la función se tiene que ejecutar siempre y sólo una vez
+//independientemente del número de instancias en memoria de ese objeto
+//porque en principio responden al mismo objeto persistente y cada vez que se solicite información de éste
+//será la misma en cualquier instancia
+
+//porque el problema actual es que la dessubscripción la intenta hacer una instancia diferente a la que hizo la subscripción
+//entonces la referencia a la función handler no es la misma así que no lo borra
+//nuestro event manager debería entender lo que queremos hacer independientemente de la instancia concreta que lo pida
+
+//queremos hacer esto? lo que estamos diciendo es que lo que hay en memoria no es la realidad
+//que la realidad es sólo los objetos que se crean en el repo, los objetos persistentes
+//es que si no lo hacemos así tendríamos que diseñar un mecanismo de inicialización de las subscripciones
+//específico para cada aplicación
+//mejor tener uno general que ya sea capaz de persistir y recargarse conforme se vaya necesitando
+//y utilizar siempre ese
 
                 let user = await prioritizer.getUser({ 
                     id: chatId,
