@@ -5,6 +5,8 @@ module.exports = function(){
         let user, selectedText
 
         beforeEach(async function(){
+            this.timeout(10000)
+
             selectedText = undefined
             async function greaterFunction(task1, task2){
                 if (task1 > task2) return task1;
@@ -49,7 +51,6 @@ module.exports = function(){
 
         describe('complete a task', function(){
             it('complete the task in the middle of the list', async function(){
-                this.timeout(10000)
                 await user.addTask('1 go shopping')
                 await user.addTask('2 fix the car')
                 await user.addTask('3 clean up')
@@ -60,6 +61,19 @@ module.exports = function(){
                 expect(tasks.length).to.equal(2)
                 expect(tasks[0]).to.equal('3 clean up')
                 expect(tasks[1]).to.equal('1 go shopping')
+            })
+        })
+
+        describe('logs', function(){
+            it('getting logs when task is created', async function(){
+                let user2 = await this.getUser(greaterFunction, selectFunction)
+                await user2.enableGlobalActivityLogs()
+
+                await user.addTask('any task')
+
+                let logs = await user2.readLogs()
+                expect(logs.length).to.equal(1)
+                expect(logs[0]).to.contain('tarea creada')
             })
         })
     })
