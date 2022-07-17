@@ -67,6 +67,11 @@ module.exports = async function({client, greaterFunction, selectFunction}){
                     await client.sendCallback(callback);
                 }
             }
+        },
+        getStatistics: async function(){
+            await sendMessage('/statistics')
+            let response = await waitResponse()
+            
         }
     }
 }

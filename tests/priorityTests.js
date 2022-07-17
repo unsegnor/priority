@@ -62,5 +62,14 @@ module.exports = function(){
                 expect(tasks[1]).to.equal('1 go shopping')
             })
         })
+
+          describe('statistics', function(){
+            it('introducing a task should increase the number of introduced tasks', async function(){
+                await user.addTask('any task')
+                let statistics = await user.getStatistics()
+
+                expect(statistics.createdTasks).to.equal(1)
+            })
+        })
     })
 }

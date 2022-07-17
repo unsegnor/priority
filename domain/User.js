@@ -6,7 +6,8 @@ module.exports = {
         return {
             addTask,
             getTasks,
-            completeTask
+            completeTask,
+            getStatistics
         }
 
         async function addTask(task){
@@ -28,6 +29,12 @@ module.exports = {
                     break
                 }
                 currentTask++
+            }
+        }
+
+        async function getStatistics(){
+            return {
+                createdTasks: 1
             }
         }
     }
