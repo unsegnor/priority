@@ -6,7 +6,9 @@ module.exports = {
         return {
             addTask,
             getTasks,
-            completeTask
+            completeTask,
+            enableGlobalActivityLogs,
+            readLogs
         }
 
         async function addTask(task){
@@ -29,6 +31,14 @@ module.exports = {
                 }
                 currentTask++
             }
+        }
+
+        async function enableGlobalActivityLogs(){
+            
+        }
+
+        async function readLogs(){
+
         }
     }
 }

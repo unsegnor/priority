@@ -16,6 +16,7 @@ module.exports = async function({client, greaterFunction, selectFunction}){
 
     async function waitResponse(){
         const updates = await client.getUpdates();
+        console.log("updates", updates.result)
         if(updates.result.length > 1) throw new Error("We were expecting one message but got more")
         return updates.result[0].message
     }
@@ -67,6 +68,12 @@ module.exports = async function({client, greaterFunction, selectFunction}){
                     await client.sendCallback(callback);
                 }
             }
+        },
+        enableGlobalActivityLogs: async function(){
+            await sendMessage('/enable-logs')
+        },
+        readLogs: async function(){
+            return waitResponse()
         }
     }
 }
