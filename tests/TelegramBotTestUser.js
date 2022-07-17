@@ -16,7 +16,6 @@ module.exports = async function({client, greaterFunction, selectFunction}){
 
     async function waitResponse(){
         const updates = await client.getUpdates();
-        console.log("updates", updates.result)
         if(updates.result.length > 1) throw new Error("We were expecting one message but got more")
         return updates.result[0].message
     }
@@ -69,11 +68,24 @@ module.exports = async function({client, greaterFunction, selectFunction}){
                 }
             }
         },
-        enableGlobalActivityLogs: async function(){
+        enableGlobalLogs: async function(){
             await sendMessage('/enable-logs')
+            let response = await waitResponse()
+            if(response.text != 'Logs activados') throw new Error('Logs were not enabled')
         },
         readLogs: async function(){
-            return waitResponse()
+            try{
+                let response = await waitResponse()
+                console.log(response)
+                return [response.text]
+            }catch{
+                return []
+            }
+        },
+        disableGlobalLogs: async function(){
+            await sendMessage('/disable-logs')
+            let response = await waitResponse()
+            if(response.text != 'Logs desactivados') throw new Error('Logs were not disabled')
         }
     }
 }

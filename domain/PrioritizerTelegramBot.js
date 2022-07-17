@@ -79,6 +79,10 @@ module.exports = {
             })
           }
 
+          async function sendLog(chatId, message){
+            bot.sendMessage(chatId, message)
+          }
+
         async function start(){
             const botOptions = {polling: true, baseApiUrl: serverUrl};
             bot = new TelegramBot(token, botOptions);
@@ -92,15 +96,41 @@ module.exports = {
 
                 if(msg.text.startsWith('/start')) return
                 
-                let user = await prioritizer.getUser({
+//TODO creo que el problema es que las instancias son dieferentes, el estado no se mantiene entre llamadas, tampoco las suscripciones a eventos, estamos creando un usuario nuevo por cada llamada
+//tendríamos que hacer un event emitter que se mantenga entre llamadas
+//o volver a establecer los enlaces cuando cargamos un usuario, pero claro, aún así se podrían duplicar...
+//queremos que el usario se cargue con todo, si estaba escuchando a un evento, esa propiedad, de estar escuchando, tiene que consultarse en el usuario, cada vez
+//claro que cómo hacemos eso? tenemos un objeto globalevents que persiste, y cuando sucede un evento... qué?
+//por ejemplo, no estamos almacenando el estado de si un usuario tiene o no los logs activados
+//por eso podríamos activarlo más de una vez y se crearían dos subscripciones al evento
+
+//o bien mantener a los usuarios cargados en memoria, los mismos todo el rato, las mismas instancias
+//aún así en algún momento se recargarán?
+//el problema es que persistent programing de momento no permite almacenar referencias a funciones
+//que luego se puedan ejecutar
+
+//quizá el mecanismo de los eventos deba estar más integrado en persistent programming
+
+                let user = await prioritizer.getUser({ 
                     id: chatId,
                     greaterFunction: compareWhichTaskIsMoreImportant.bind(undefined, chatId),
-                    selectFunction: selectTask.bind(undefined, chatId)
+                    selectFunction: selectTask.bind(undefined, chatId),
+                    receiveLog: sendLog.bind(undefined, chatId)
                   })
                 
                 if(msg.text.startsWith('/completar')){
                   await user.completeTask()
+                }else if(msg.text.startsWith('/enable-logs')){
+                  await user.enableGlobalLogs()
+                  await bot.sendMessage(chatId, 'Logs activados');
+                  return
+                }else if(msg.text.startsWith('/disable-logs')){
+                  console.log('desactivando logs')
+                  await user.disableGlobalLogs()
+                  await bot.sendMessage(chatId, 'Logs desactivados');
+                  return
                 }else{
+                  console.log('añadiendo tarea', msg.text)
                   await user.addTask(msg.text)
                 }
                 

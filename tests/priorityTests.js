@@ -67,13 +67,34 @@ module.exports = function(){
         describe.only('logs', function(){
             it('getting logs when task is created', async function(){
                 let user2 = await this.getUser('2', this.greaterFunction, this.selectFunction)
-                await user2.enableGlobalActivityLogs()
+                await user2.enableGlobalLogs()
 
                 await user.addTask('any task')
 
                 let logs = await user2.readLogs()
                 expect(logs.length).to.equal(1)
                 expect(logs[0]).to.contain('tarea creada')
+            })
+
+            it.only('disabling logs', async function(){
+                let user2 = await this.getUser('2', this.greaterFunction, this.selectFunction)
+                await user2.enableGlobalLogs()
+                await user2.disableGlobalLogs()
+
+                await user.addTask('any task')
+
+                let logs = await user2.readLogs()
+                console.log(logs)
+                expect(logs.length).to.equal(0)
+            })
+
+            it('logs disabled by default', async function(){
+                let user2 = await this.getUser('2', this.greaterFunction, this.selectFunction)
+
+                await user.addTask('any task')
+
+                let logs = await user2.readLogs()
+                expect(logs.length).to.equal(0)
             })
         })
     })

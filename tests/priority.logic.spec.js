@@ -1,20 +1,22 @@
 const { expect } = require("chai")
 const Prioritizer = require('../index.js')
 const {TestRepository} = require('persistent-programming')
-const User = require('../domain/User')
+const PrioritizerTestUser = require('./PrioritizerTestUser')
 const PriorityTests = require('./priorityTests')
 
 describe('Logic tests', function(){
     let prioritizer
 
-    beforeEach(function(){
+    beforeEach(async function(){
         prioritizer = Prioritizer.createNew(TestRepository())
 
-        this.getUser = async function(id, greaterFunction, selectFunction){
-            return prioritizer.getUser({
+        this.getUser = async function(id, greaterFunction, selectFunction, receiveLog){
+            return PrioritizerTestUser({
+                prioritizer,
                 id,
                 greaterFunction,
-                selectFunction
+                selectFunction,
+                receiveLog
             })
         }
     }) 
