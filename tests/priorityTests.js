@@ -110,6 +110,49 @@ module.exports = function(){
                 let logs = await user2.readLogs()
                 expect(logs.length).to.equal(0)
             })
+
+            // it('logs disabled by default', async function(){
+            //     AAA(async () => {
+            //         let user2 = await this.getUser('2', this.greaterFunction, this.selectFunction)
+            //     },
+            //     async () => {
+            //         await user.addTask('any task')
+            //     },
+            //     async () => {
+            //         let logs = await user2.readLogs()
+            //         expect(logs.length).to.equal(0)
+            //     })
+            // })
+
+            AAA('logs disabled by default', async () => {
+                this.user2 = await this.getUser('2', this.greaterFunction, this.selectFunction)
+            },
+            async () => {
+                await user.addTask('any task')
+            },
+            async () => {
+                let logs = await this.user2.readLogs()
+                expect(logs.length).to.equal(0)
+            })
+
+            function AAA(testTitle, arrange, act, assert){
+                it(testTitle, async function(){
+                    await arrange.call(this)
+                    await act.call(this)
+                    await assert.call(this)
+                })
+            
+                it(testTitle +' with restart', async function(){
+                    await arrange.call(this)
+                    await restart.call(this)
+                    await act.call(this)
+                    await assert.call(this)
+                })
+            }
+            
+            //TODO test with restart between the arrange and the act and between the act and the assert
+            //TODO test with update between the arrange and the act, between the act and the assert and before the arrange
+            //or mutate the test adding the restart or the update after every sentence
         })
     })
 }
