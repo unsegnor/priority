@@ -11,6 +11,7 @@ module.exports = {
         const prioritizer = Prioritizer.createNew(repository)
         let serverUrl = undefined
         let bot
+        let users = {}
         return {
             setTelegramServerURL: function(url){
                 serverUrl = url
@@ -83,6 +84,18 @@ module.exports = {
             bot.sendMessage(chatId, message)
           }
 
+        async function getUser(id){
+          if(users[id]) return users[id]
+          let user = await prioritizer.getUser({ 
+            id,
+            greaterFunction: compareWhichTaskIsMoreImportant.bind(undefined, id),
+            selectFunction: selectTask.bind(undefined, id),
+            receiveLog: sendLog.bind(undefined, id)
+          })
+          users[id] = user
+          return user
+        }
+
         async function start(){
             const botOptions = {polling: true, baseApiUrl: serverUrl};
             bot = new TelegramBot(token, botOptions);
@@ -95,45 +108,7 @@ module.exports = {
                 }
 
                 if(msg.text.startsWith('/start')) return
-                
-//TODO creo que el problema es que las instancias son dieferentes, el estado no se mantiene entre llamadas, tampoco las suscripciones a eventos, estamos creando un usuario nuevo por cada llamada
-//tendríamos que hacer un event emitter que se mantenga entre llamadas
-//o volver a establecer los enlaces cuando cargamos un usuario, pero claro, aún así se podrían duplicar...
-//queremos que el usario se cargue con todo, si estaba escuchando a un evento, esa propiedad, de estar escuchando, tiene que consultarse en el usuario, cada vez
-//claro que cómo hacemos eso? tenemos un objeto globalevents que persiste, y cuando sucede un evento... qué?
-//por ejemplo, no estamos almacenando el estado de si un usuario tiene o no los logs activados
-//por eso podríamos activarlo más de una vez y se crearían dos subscripciones al evento
-
-//o bien mantener a los usuarios cargados en memoria, los mismos todo el rato, las mismas instancias
-//aún así en algún momento se recargarán?
-//el problema es que persistent programing de momento no permite almacenar referencias a funciones
-//que luego se puedan ejecutar
-
-//quizá el mecanismo de los eventos deba estar más integrado en persistent programming
-//tenemos que hacer un persisten-event-manager?
-//de modo que si se establece una suscripción a un evento de un objeto
-//entonces el código de la función se tiene que ejecutar siempre y sólo una vez
-//independientemente del número de instancias en memoria de ese objeto
-//porque en principio responden al mismo objeto persistente y cada vez que se solicite información de éste
-//será la misma en cualquier instancia
-
-//porque el problema actual es que la dessubscripción la intenta hacer una instancia diferente a la que hizo la subscripción
-//entonces la referencia a la función handler no es la misma así que no lo borra
-//nuestro event manager debería entender lo que queremos hacer independientemente de la instancia concreta que lo pida
-
-//queremos hacer esto? lo que estamos diciendo es que lo que hay en memoria no es la realidad
-//que la realidad es sólo los objetos que se crean en el repo, los objetos persistentes
-//es que si no lo hacemos así tendríamos que diseñar un mecanismo de inicialización de las subscripciones
-//específico para cada aplicación
-//mejor tener uno general que ya sea capaz de persistir y recargarse conforme se vaya necesitando
-//y utilizar siempre ese
-
-                let user = await prioritizer.getUser({ 
-                    id: chatId,
-                    greaterFunction: compareWhichTaskIsMoreImportant.bind(undefined, chatId),
-                    selectFunction: selectTask.bind(undefined, chatId),
-                    receiveLog: sendLog.bind(undefined, chatId)
-                  })
+                let user = await getUser(chatId)
                 
                 if(msg.text.startsWith('/completar')){
                   await user.completeTask()
@@ -142,12 +117,10 @@ module.exports = {
                   await bot.sendMessage(chatId, 'Logs activados');
                   return
                 }else if(msg.text.startsWith('/disable-logs')){
-                  console.log('desactivando logs')
                   await user.disableGlobalLogs()
                   await bot.sendMessage(chatId, 'Logs desactivados');
                   return
                 }else{
-                  console.log('añadiendo tarea', msg.text)
                   await user.addTask(msg.text)
                 }
                 

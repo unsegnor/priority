@@ -76,7 +76,6 @@ module.exports = async function({client, greaterFunction, selectFunction}){
         readLogs: async function(){
             try{
                 let response = await waitResponse()
-                console.log(response)
                 return [response.text]
             }catch{
                 return []

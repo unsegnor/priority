@@ -3,6 +3,7 @@ const PrioritizedList = require("./PrioritizedList")
 module.exports = {
     create: async function({id, greaterFunction, repository, selectFunction, receiveLog, globalEvents}){
         let list = await PrioritizedList.getPersistentPrioritizedList(greaterFunction, id, repository)
+        let globalLogsEnabled = false
         return {
             addTask,
             getTasks,
@@ -35,7 +36,10 @@ module.exports = {
         }
 
         async function enableGlobalLogs(){
-            await globalEvents.on('task-created', onTaskCreated)
+            if(!globalLogsEnabled){
+                await globalEvents.on('task-created', onTaskCreated)
+                globalLogsEnabled = true
+            }
         }
 
         async function onTaskCreated(){
@@ -43,9 +47,10 @@ module.exports = {
         }
 
         async function disableGlobalLogs(){
-            console.log('antes', globalEvents.listeners('task-created'))
-            await globalEvents.removeListener('task-created', onTaskCreated)
-            console.log('después', globalEvents.listeners('task-created'))
+            if(globalLogsEnabled){
+                await globalEvents.removeListener('task-created', onTaskCreated)
+                globalLogsEnabled = false
+            }
         }
     }
 }
