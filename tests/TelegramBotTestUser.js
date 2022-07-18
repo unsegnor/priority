@@ -69,21 +69,27 @@ module.exports = async function({client, greaterFunction, selectFunction}){
             }
         },
         enableGlobalLogs: async function(){
+            console.log('enviando mensaje para activar logs')
             await sendMessage('/enable-logs')
+            console.log('esperando respuesta de enable')
             let response = await waitResponse()
+            console.log('recibida respuesta de enable')
             if(response.text != 'Logs activados') throw new Error('Logs were not enabled')
         },
         readLogs: async function(){
             try{
-                let response = await waitResponse()
+                let response = await waitResponse() //TODO: creo que esto da problemas, este try catch
                 return [response.text]
             }catch{
                 return []
             }
         },
         disableGlobalLogs: async function(){
+            console.log('sending disable message')
             await sendMessage('/disable-logs')
+            console.log('esperando respuesta de disable')
             let response = await waitResponse()
+            console.log('recibida respuesta de disable')
             if(response.text != 'Logs desactivados') throw new Error('Logs were not disabled')
         }
     }

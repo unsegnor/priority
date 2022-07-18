@@ -14,7 +14,7 @@ module.exports = function(){
             return server.config.apiURL
         },
         getClient: async function(userId){
-            return server.getClient(token, {userId, chatId: userId})
+            return server.getClient(token, {userId, chatId: userId, timeout: 500})
         },
         stop: async function(){
             await server.stop()
