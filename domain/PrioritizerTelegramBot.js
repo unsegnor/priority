@@ -102,7 +102,6 @@ module.exports = {
 
             bot.on('message', async (msg) => {
                 const chatId = msg.chat.id;
-                console.log(chatId, msg.text)
                 if(msg.text.startsWith('/version')) {
                     bot.sendMessage(chatId, packageJson.version)
                     return
@@ -115,14 +114,11 @@ module.exports = {
                   await user.completeTask()
                 }else if(msg.text.startsWith('/enable-logs')){
                   await user.enableGlobalLogs()
-                  console.log('enviando mensaje de logs activados')
                   bot.sendMessage(chatId, 'Logs activados');
                   return
                 }else if(msg.text.startsWith('/disable-logs')){
                   await user.disableGlobalLogs()
-                  console.log('sending message of disabled logs')
                   bot.sendMessage(chatId, 'Logs desactivados');
-                  console.log('sent message of disabled logs')
                   return
                 }else{
                   await user.addTask(msg.text)
