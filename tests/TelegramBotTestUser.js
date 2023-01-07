@@ -69,27 +69,26 @@ module.exports = async function({client, greaterFunction, selectFunction}){
             }
         },
         enableGlobalLogs: async function(){
-            console.log('enviando mensaje para activar logs')
             await sendMessage('/enable-logs')
-            console.log('esperando respuesta de enable')
             let response = await waitResponse()
-            console.log('recibida respuesta de enable')
             if(response.text != 'Logs activados') throw new Error('Logs were not enabled')
         },
         readLogs: async function(){
-            try{
-                let response = await waitResponse() //TODO: creo que esto da problemas, este try catch
+                //we check the history to see if there are new messages, otherwise we return empty array
+                //we do it this way because the getUpdates method from the client not always throws an exception that can be catched
+                var history = await client.getUpdatesHistory()
+                var newMessages = false
+                for(let message of history){
+                    if(!message.isRead) newMessages = true 
+                }
+                if(!newMessages) return []
+
+                let response = await waitResponse()
                 return [response.text]
-            }catch{
-                return []
-            }
         },
         disableGlobalLogs: async function(){
-            console.log('sending disable message')
             await sendMessage('/disable-logs')
-            console.log('esperando respuesta de disable')
             let response = await waitResponse()
-            console.log('recibida respuesta de disable')
             if(response.text != 'Logs desactivados') throw new Error('Logs were not disabled')
         }
     }

@@ -76,7 +76,7 @@ module.exports = function(){
                 expect(logs[0]).to.contain('tarea creada')
             })
 
-            xit('disabling logs', async function(){
+            it('disabling logs', async function(){
                 this.timeout(10000)
                 let user2 = await this.getUser('2', this.greaterFunction, this.selectFunction)
                 await user2.enableGlobalLogs()
