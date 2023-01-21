@@ -49,7 +49,7 @@ module.exports = function(){
         })
 
         describe('complete a task', function(){
-            it('complete the task in the middle of the list', async function(){
+            it('in the middle of the list', async function(){
                 this.timeout(10000)
                 await user.addTask('1 go shopping')
                 await user.addTask('2 fix the car')
@@ -61,6 +61,21 @@ module.exports = function(){
                 expect(tasks.length).to.equal(2)
                 expect(tasks[0]).to.equal('3 clean up')
                 expect(tasks[1]).to.equal('1 go shopping')
+            })
+
+            it('but the task does not exist', async function(){
+                this.timeout(10000)
+                await user.addTask('1 go shopping')
+                await user.addTask('2 fix the car')
+                await user.addTask('3 clean up')
+                selectedText = '4 task that I though was added'
+                await user.completeTask()
+                let tasks = await user.getTasks()
+        
+                expect(tasks.length).to.equal(3)
+                expect(tasks[0]).to.equal('3 clean up')
+                expect(tasks[1]).to.equal('2 fix the car')
+                expect(tasks[2]).to.equal('1 go shopping')
             })
         })
 

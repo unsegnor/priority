@@ -10,5 +10,5 @@ module.exports = {
       'index.js',
       'domain/**/*.js'
     ],
-    maxConcurrentTestRunners: 2
+    concurrency: 2
 };

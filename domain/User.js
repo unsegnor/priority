@@ -49,7 +49,6 @@ module.exports = {
         async function disableGlobalLogs(){
             if(globalLogsEnabled){
                 await globalEvents.removeListener('task-created', onTaskCreated)
-                console.log('disabled logs')
                 globalLogsEnabled = false
             }
         }
