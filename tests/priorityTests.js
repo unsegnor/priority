@@ -6,15 +6,15 @@ module.exports = function(){
 
         beforeEach(async function(){
             selectedText = undefined
-            async function greaterFunction(task1, task2){
+            this.greaterFunction = async function (task1, task2){
                 if (task1 > task2) return task1;
                 if (task2 > task1) return task2;
             }
 
-            async function selectFunction(task){
+            this.selectFunction = async function(task){
                 return (task.includes(selectedText))
             }
-            user = await this.getUser(greaterFunction, selectFunction)
+            user = await this.getUser('1', this.greaterFunction, this.selectFunction)
         })
 
 
@@ -37,6 +37,7 @@ module.exports = function(){
             })
     
             it('introducing a task that goes in the middle', async function(){
+                this.timeout(10000)
                 await user.addTask('1 go shopping')
                 await user.addTask('3 clean up')
                 await user.addTask('2 fix the car')
@@ -48,7 +49,7 @@ module.exports = function(){
         })
 
         describe('complete a task', function(){
-            it('complete the task in the middle of the list', async function(){
+            it('in the middle of the list', async function(){
                 this.timeout(10000)
                 await user.addTask('1 go shopping')
                 await user.addTask('2 fix the car')
@@ -60,6 +61,70 @@ module.exports = function(){
                 expect(tasks.length).to.equal(2)
                 expect(tasks[0]).to.equal('3 clean up')
                 expect(tasks[1]).to.equal('1 go shopping')
+            })
+
+            it('but the task does not exist', async function(){
+                this.timeout(10000)
+                await user.addTask('1 go shopping')
+                await user.addTask('2 fix the car')
+                await user.addTask('3 clean up')
+                selectedText = '4 task that I though was added'
+                await user.completeTask()
+                let tasks = await user.getTasks()
+        
+                expect(tasks.length).to.equal(3)
+                expect(tasks[0]).to.equal('3 clean up')
+                expect(tasks[1]).to.equal('2 fix the car')
+                expect(tasks[2]).to.equal('1 go shopping')
+            })
+        })
+
+        describe('logs', function(){
+            it('getting logs when task is created', async function(){
+                let user2 = await this.getUser('2', this.greaterFunction, this.selectFunction)
+                await user2.enableGlobalLogs()
+
+                await user.addTask('any task')
+
+                let logs = await user2.readLogs()
+                expect(logs.length).to.equal(1)
+                expect(logs[0]).to.contain('tarea creada')
+            })
+
+            it('disabling logs', async function(){
+                this.timeout(10000)
+                let user2 = await this.getUser('2', this.greaterFunction, this.selectFunction)
+                await user2.enableGlobalLogs()
+                await user2.disableGlobalLogs()
+
+                await user.addTask('any task')
+
+                let logs = await user2.readLogs()
+                expect(logs.length).to.equal(0)
+            })
+
+            it('disabling should disable any amount of enables', async function(){
+                this.timeout(10000)
+                let user2 = await this.getUser('2', this.greaterFunction, this.selectFunction)
+                await user2.enableGlobalLogs()
+                await user2.enableGlobalLogs()
+                await user2.enableGlobalLogs()
+                await user2.disableGlobalLogs()
+
+                await user.addTask('any task')
+
+                let logs = await user2.readLogs()
+                expect(logs.length).to.equal(0)
+            })
+
+            it('logs disabled by default', async function(){
+                this.timeout(10000)
+                let user2 = await this.getUser('2', this.greaterFunction, this.selectFunction)
+
+                await user.addTask('any task')
+
+                let logs = await user2.readLogs()
+                expect(logs.length).to.equal(0)
             })
         })
     })

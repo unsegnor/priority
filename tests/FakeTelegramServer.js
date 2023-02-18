@@ -9,13 +9,12 @@ module.exports = function(){
             let serverConfig = {port: 9001}
             server = new TelegramServer(serverConfig);
             await server.start()
-            client = server.getClient(token)
         },
         getUrl: function(){
             return server.config.apiURL
         },
-        getClient: function(){
-            return client
+        getClient: async function(userId){
+            return server.getClient(token, {userId, chatId: userId, timeout: 500})
         },
         stop: async function(){
             await server.stop()

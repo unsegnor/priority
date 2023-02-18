@@ -16,6 +16,7 @@
   },
   "scripts": {
     "test": "mocha tests && npm run test-mutation",
+    "unit": "mocha tests",
     "test-mocha": "npm run test-doubles && npm run test-domain && npm run test-adapters && npm run test-integration && npm run test-mutation",
     "test-domain": "mocha domain --recursive",
     "test-doubles": "mocha test-doubles --recursive",

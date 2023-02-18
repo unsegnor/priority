@@ -67,6 +67,29 @@ module.exports = async function({client, greaterFunction, selectFunction}){
                     await client.sendCallback(callback);
                 }
             }
+        },
+        enableGlobalLogs: async function(){
+            await sendMessage('/enable-logs')
+            let response = await waitResponse()
+            if(response.text != 'Logs activados') throw new Error('Logs were not enabled')
+        },
+        readLogs: async function(){
+                //we check the history to see if there are new messages, otherwise we return empty array
+                //we do it this way because the getUpdates method from the client not always throws an exception that can be catched
+                var history = await client.getUpdatesHistory()
+                var newMessages = false
+                for(let message of history){
+                    if(!message.isRead) newMessages = true 
+                }
+                if(!newMessages) return []
+
+                let response = await waitResponse()
+                return [response.text]
+        },
+        disableGlobalLogs: async function(){
+            await sendMessage('/disable-logs')
+            let response = await waitResponse()
+            if(response.text != 'Logs desactivados') throw new Error('Logs were not disabled')
         }
     }
 }
