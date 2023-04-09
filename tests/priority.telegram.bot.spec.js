@@ -7,13 +7,23 @@ const FakeTelegramServer = require('./FakeTelegramServer')
 const packageJson = require('../package.json')
 
 describe('Telegram bot tests', function(){
-    let telegramServer, bot
+    let telegramServer, bot, testRepository
+
+    async function initializeScenario(){
+
+    }
+
+    async function stopScenario(){
+
+    }
 
     beforeEach(async function(){
+        testRepository = TestRepository();
+
         telegramServer = FakeTelegramServer()
         await telegramServer.start()
 
-        bot = await PrioritizerTelegramBot.createNew(TestRepository(), telegramServer.getToken())
+        bot = await PrioritizerTelegramBot.createNew(testRepository, telegramServer.getToken())
         bot.setTelegramServerURL(telegramServer.getUrl())
         await bot.start()
 
@@ -24,6 +34,18 @@ describe('Telegram bot tests', function(){
                 selectFunction,
                 receiveLog
             })
+        }
+
+        this.restart = async function(){
+            await bot.stop()
+            await telegramServer.stop()
+
+            telegramServer = FakeTelegramServer()
+            await telegramServer.start()
+
+            bot = await PrioritizerTelegramBot.createNew(testRepository, telegramServer.getToken())
+            bot.setTelegramServerURL(telegramServer.getUrl())
+            await bot.start()
         }
     })
 

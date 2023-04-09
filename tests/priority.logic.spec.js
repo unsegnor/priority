@@ -5,10 +5,12 @@ const PrioritizerTestUser = require('./PrioritizerTestUser')
 const PriorityTests = require('./priorityTests')
 
 describe('Logic tests', function(){
-    let prioritizer
+    let prioritizer, testRepository
 
     beforeEach(async function(){
-        prioritizer = Prioritizer.createNew(TestRepository())
+        testRepository = TestRepository()
+
+        prioritizer = Prioritizer.createNew(testRepository)
 
         this.getUser = async function(id, greaterFunction, selectFunction, receiveLog){
             return PrioritizerTestUser({
@@ -18,6 +20,10 @@ describe('Logic tests', function(){
                 selectFunction,
                 receiveLog
             })
+        }
+
+        this.restart = async function(){
+            prioritizer = Prioritizer.createNew(testRepository)
         }
     }) 
 
