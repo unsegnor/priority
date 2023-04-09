@@ -17,7 +17,6 @@ module.exports = function(){
             user = await this.getUser('1', this.greaterFunction, this.selectFunction)
         })
 
-
         describe('Introducing tasks', async function(){
             it('introducing a task', async function(){
                 await user.addTask('go shopping')
@@ -117,7 +116,7 @@ module.exports = function(){
                 expect(logs.length).to.equal(0)
             })
 
-            it('logs disabled by default', async function(){
+            it('logs are disabled by default', async function(){
                 this.timeout(10000)
                 let user2 = await this.getUser('2', this.greaterFunction, this.selectFunction)
 
@@ -125,6 +124,22 @@ module.exports = function(){
 
                 let logs = await user2.readLogs()
                 expect(logs.length).to.equal(0)
+            })
+
+            it.only('logs should continue enabled after restarting the application', async function(){
+                this.timeout(10000)
+                let user1 = await this.getUser('1', this.greaterFunction, this.selectFunction)
+                let user2 = await this.getUser('2', this.greaterFunction, this.selectFunction)
+                await user2.enableGlobalLogs()
+                await this.restart()
+
+                user1 = await this.getUser('1', this.greaterFunction, this.selectFunction)
+                user2 = await this.getUser('2', this.greaterFunction, this.selectFunction)
+                await user1.addTask('any task')
+
+                let logs = await user2.readLogs()
+                expect(logs.length).to.equal(1)
+                expect(logs[0]).to.contain('tarea creada')
             })
         })
     })
