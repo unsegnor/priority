@@ -3,7 +3,37 @@ const PrioritizedList = require("./PrioritizedList")
 module.exports = {
     create: async function({id, greaterFunction, repository, selectFunction, receiveLog, globalEvents}){
         let list = await PrioritizedList.getPersistentPrioritizedList(greaterFunction, id, repository)
-        let globalLogsEnabled = false
+        let userState
+        let configuration
+        await initializeConfiguration()
+
+        async function initializeConfiguration(){
+            //TODO: simplify this adding new features to persistent programming
+
+            userState = await repository.getRoot(`${id}-user`)
+            configuration = await userState.get('configuration')
+            if(!configuration) { 
+                console.log(id, 'creating new configuration')
+                //TODO: here we had to initialize the object if it didn't exist, but it should be done by persistent programming
+                configuration = await repository.getNew()
+                userState.set('configuration', configuration)
+            }
+
+            //TODO: this is also an initialization, we could have an initialize function in persistent programming
+            if(!(await configuration.get('globalLogsEnabled'))) await configuration.set('globalLogsEnabled', 'false')
+
+            //TODO: this is also a bit weird but maybe unavoidable, in the end we have to set the listeners again whenever we load the user or persist the listeners
+            let globalLogsEnabled = await isConfigLogsEnabled()
+            console.log(id, 'globalLogsEnabled during initialization:', globalLogsEnabled)
+            if(globalLogsEnabled) await globalEvents.on('task-created', onTaskCreated)
+
+            //console.log('globalEvents', globalEvents)
+        }
+
+        async function isConfigLogsEnabled(){
+            return (await configuration.get('globalLogsEnabled')) == 'true'
+        }
+
         return {
             addTask,
             getTasks,
@@ -14,6 +44,7 @@ module.exports = {
 
         async function addTask(task){
             await list.add(task)
+            console.log(id, 'emitting task-created')
             globalEvents.emit('task-created')
         }
 
@@ -36,20 +67,23 @@ module.exports = {
         }
 
         async function enableGlobalLogs(){
-            if(!globalLogsEnabled){
+            if(!(await isConfigLogsEnabled())){
+                console.log(id, 'enabling global logs')
                 await globalEvents.on('task-created', onTaskCreated)
-                globalLogsEnabled = true
+                await configuration.set('globalLogsEnabled', 'true')
+                console.log(id, 'enabled global logs', await isConfigLogsEnabled())
             }
         }
 
         async function onTaskCreated(){
+            console.log(id, 'received task created')
             await receiveLog('tarea creada')
         }
 
         async function disableGlobalLogs(){
-            if(globalLogsEnabled){
+            if(await isConfigLogsEnabled()){
                 await globalEvents.removeListener('task-created', onTaskCreated)
-                globalLogsEnabled = false
+                await configuration.set('globalLogsEnabled', 'false')
             }
         }
     }

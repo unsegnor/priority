@@ -28,6 +28,7 @@ describe('Telegram bot tests', function(){
         await bot.start()
 
         this.getUser = async function(id, greaterFunction, selectFunction, receiveLog){
+            console.log('creating user',id)
             return TelegramBotTestUser({
                 client: await telegramServer.getClient(id),
                 greaterFunction,
