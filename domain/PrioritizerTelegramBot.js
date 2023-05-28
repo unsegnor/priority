@@ -11,6 +11,7 @@ module.exports = {
         const prioritizer = Prioritizer.createNew(repository)
         let serverUrl = undefined
         let bot
+        let users = {}
         return {
             setTelegramServerURL: function(url){
                 serverUrl = url
@@ -79,6 +80,22 @@ module.exports = {
             })
           }
 
+          async function sendLog(chatId, message){
+            bot.sendMessage(chatId, message)
+          }
+
+        async function getUser(id){
+          if(users[id]) return users[id]
+          let user = await prioritizer.getUser({ 
+            id,
+            greaterFunction: compareWhichTaskIsMoreImportant.bind(undefined, id),
+            selectFunction: selectTask.bind(undefined, id),
+            receiveLog: sendLog.bind(undefined, id)
+          })
+          users[id] = user
+          return user
+        }
+
         async function start(){
             const botOptions = {polling: true, baseApiUrl: serverUrl};
             bot = new TelegramBot(token, botOptions);
@@ -91,15 +108,18 @@ module.exports = {
                 }
 
                 if(msg.text.startsWith('/start')) return
-                
-                let user = await prioritizer.getUser({
-                    id: chatId,
-                    greaterFunction: compareWhichTaskIsMoreImportant.bind(undefined, chatId),
-                    selectFunction: selectTask.bind(undefined, chatId)
-                  })
+                let user = await getUser(chatId)
                 
                 if(msg.text.startsWith('/completar')){
                   await user.completeTask()
+                }else if(msg.text.startsWith('/enable-logs')){
+                  await user.enableGlobalLogs()
+                  await bot.sendMessage(chatId, 'Logs activados');
+                  return
+                }else if(msg.text.startsWith('/disable-logs')){
+                  await user.disableGlobalLogs()
+                  await bot.sendMessage(chatId, 'Logs desactivados');
+                  return
                 }else{
                   await user.addTask(msg.text)
                 }
