@@ -111,6 +111,7 @@ module.exports = {
                 let user = await getUser(chatId) 
                 //TODO: we only load the users when they are being called, if we want to listen to other's events we'll need to load them all at the start or communicate through another mechanism
                 //we need both users to be inmemory for one to receive the logs from the other, I think we need to think another way of communicating between users
+                //we need the application to be aware of the different users
                 
                 if(msg.text.startsWith('/completar')){
                   await user.completeTask()
