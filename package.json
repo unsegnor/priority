@@ -7,7 +7,7 @@
     "node": ">=14.0.0"
   },
   "devDependencies": {
-    "@stryker-mutator/core": "7.1.0",
+    "@stryker-mutator/core": "7.1.1",
     "@stryker-mutator/mocha-runner": "7.1.0",
     "allcombinations": "^1.1.5",
     "chai": "^4.2.0",
