@@ -103,40 +103,19 @@ module.exports = {
             }
           }
 
-          async function showRecurrentTasksList(bot, user, chatId){
-            //console.log('showing recurrent tasks')
-            let tasks = await user.getRecurrentTasks()
-            //console.log(`tasks: ${tasks}`)
-            if(tasks.length == 0){
-              bot.sendMessage(chatId, "No hay tareas recurrentes")
-              return
-            } 
+          async function showList(bot, user, chatId){
+            let tasks = await user.getTasks()
+            let tasksString = "Esta es tu lista ordenada: \n\n"
             for(let task of tasks){
-              let taskName = (await task.get('name')) 
-              let taskText = taskName +' desde hace ' + (await task.get('time since last completion'))
-              bot.sendMessage(chatId, `${taskText}`, {
-                reply_markup: {
-                  inline_keyboard: [[
-                    {text: "Completar", callback_data: JSON.stringify({query_id:taskName, chatId, response: 'complete'})}
-                  ]]
-                }
-              })
+              tasksString += task + "\n"
             }
+          
+            bot.sendMessage(chatId, tasksString);
           }
 
         async function start(){
             const botOptions = {polling: true, baseApiUrl: serverUrl};
             bot = new TelegramBot(token, botOptions);
-
-            async function showList(user, chatId){
-              let tasks = await user.getTasks()
-              let tasksString = "Esta es tu lista ordenada: \n\n"
-              for(let task of tasks){
-                tasksString += task + "\n"
-              }
-            
-              bot.sendMessage(chatId, tasksString);
-            }
 
             bot.on('message', async (msg) => {
                 const chatId = msg.chat.id;
