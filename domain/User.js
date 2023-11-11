@@ -10,7 +10,8 @@ module.exports = {
             completeTask,
             addRecurrentTask,
             getRecurrentTasks,
-            completeRecurrentTask
+            completeRecurrentTask,
+            removeRecurrentTask
         }
 
         async function addTask(task){
@@ -45,12 +46,16 @@ module.exports = {
         async function getRecurrentTasks(){
             let tasks = await user.get('recurrent tasks')
             if(!tasks) return []
+            let notRemovedTasks = []
             for(let task of tasks){
-                let creationTime = await task.get('creation time')
-                let difference = obtenerDiferenciaEnFormatoLegible(new Date(creationTime), new Date())
-                await task.set('time since last completion', difference)
+                if(await task.get('status') != 'removed'){
+                    let creationTime = await task.get('creation time')
+                    let difference = obtenerDiferenciaEnFormatoLegible(new Date(creationTime), new Date())
+                    await task.set('time since last completion', difference)
+                    notRemovedTasks.push(task)
+                }
             }
-            return tasks
+            return notRemovedTasks
         }
 
         async function completeRecurrentTask(name){
@@ -58,6 +63,14 @@ module.exports = {
             if(!tasks) return
             for(let task of tasks){
                 if(await task.get('name') == name) await task.set('creation time', new Date().toISOString())
+            }
+        }
+
+        async function removeRecurrentTask(name){
+            let tasks = await user.get('recurrent tasks')
+            if(!tasks) return
+            for(let task of tasks){
+                if(await task.get('name') == name) await task.set('status', 'removed')
             }
         }
 

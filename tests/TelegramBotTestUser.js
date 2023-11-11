@@ -97,6 +97,10 @@ module.exports = async function({client, greaterFunction, selectFunction}){
                         //console.log('reply_markup', response.message.reply_markup)
                         let completeOption = response.message.reply_markup.inline_keyboard[0][0]
                         await sendCallBack(completeOption.callback_data)
+                    },
+                    remove: async function(){
+                        let removeOption = response.message.reply_markup.inline_keyboard[0][1]
+                        await sendCallBack(removeOption.callback_data)
                     }
                 })
             }
@@ -113,6 +117,14 @@ module.exports = async function({client, greaterFunction, selectFunction}){
             }
             //get all the recurrent tasks with their possible callbacks
             //call the callback for the one with the given name
+        },
+        removeRecurrentTask: async function(name){
+            let recurrentTasks = await this.getRecurrentTasks()
+            for(let task of recurrentTasks){
+                let taskName = await task.get('name')
+                console.log('task name', taskName)
+                if((await task.get('name')) == name) await task.remove()
+            }
         }
     }
 

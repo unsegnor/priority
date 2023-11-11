@@ -153,6 +153,20 @@ module.exports = function(){
                 expect(await tasks[0].get('name')).to.equal('heater maintenance')
                 expect(await tasks[0].get('time since last completion')).to.equal('1 segundos')
             })
+
+            it('remove recurrent tasks', async function(){
+                this.timeout(10000)
+                await user.addRecurrentTask('heater maintenance')
+                await user.addRecurrentTask('review ceil painting looking for defects')
+                await user.addRecurrentTask('clean outside walls')
+                
+                await user.removeRecurrentTask('review ceil painting looking for defects')
+
+                let tasks = await user.getRecurrentTasks();
+                expect(tasks.length).to.equal(2)
+                expect(await tasks[0].get('name')).to.equal('heater maintenance')
+                expect(await tasks[1].get('name')).to.equal('clean outside walls')
+            })
         })
     })
 }
