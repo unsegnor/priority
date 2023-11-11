@@ -9,6 +9,10 @@ const packageJson = require('../package.json')
 
 let userState = {}
 
+//We use this structure to save the context of the queries as they are very limited in size
+//we save an id and then load the context again when it is answered
+let queryDataById = {} 
+
 module.exports = {
     createNew: async function(repository, token){
         const prioritizer = Prioritizer.createNew(repository)
@@ -93,10 +97,18 @@ module.exports = {
             for(let task of tasks){
               let taskName = (await task.get('name')) 
               let taskText = taskName +' desde hace ' + (await task.get('time since last completion'))
+              let query_id = nanoid();
+              queryDataById[query_id] = {
+                chatId,
+                taskName,
+                translateAction: function(actionId){
+                  if (actionId == 'c') return 'complete'
+                }
+              }
               bot.sendMessage(chatId, `${taskText}`, {
                 reply_markup: {
                   inline_keyboard: [[
-                    {text: "Completar", callback_data: JSON.stringify({query_id:taskName, chatId, response: 'complete'})}
+                    {text: "Completar", callback_data: JSON.stringify({query_id, r:'c'})}
                   ]]
                 }
               })
@@ -158,9 +170,11 @@ module.exports = {
             bot.on('callback_query', async function(query){
               //console.log(`received callback ${query.data}`)
               const data = JSON.parse(query.data)
-              const chatId = data.chatId
-              const taskName = data.query_id
-              const action = data.response
+              const query_id = data.query_id
+              const queryData = queryDataById[query_id]
+              const chatId = queryData.chatId
+              const taskName = queryData.taskName
+              const action = queryData.translateAction(data.r)
 
               if(action == 'complete'){
                 let user = await prioritizer.getUser({

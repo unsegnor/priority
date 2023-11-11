@@ -120,7 +120,26 @@ module.exports = function(){
                 // expect(await tasks[0].get('time since last completion')).to.equal('2 segundos')
             })
 
-            it('add several recurrent tasks')
+            it('add several recurrent tasks', async function(){
+                this.timeout(10000)
+                await user.addRecurrentTask('heater maintenance')
+                await user.addRecurrentTask('review ceil painting looking for defects')
+                await user.addRecurrentTask('clean outside walls')
+                let tasks = await user.getRecurrentTasks();
+                expect(tasks.length).to.equal(3)
+                expect(await tasks[0].get('name')).to.equal('heater maintenance')
+                expect(await tasks[1].get('name')).to.equal('review ceil painting looking for defects')
+                expect(await tasks[2].get('name')).to.equal('clean outside walls')
+            })
+
+            it('allow very long recurrent task names', async function(){
+                this.timeout(5000)
+                await user.addRecurrentTask('review ceil painting looking for defects in all the corners without any exception bla bla bla bla bla bla bla bla')
+                let tasks = await user.getRecurrentTasks();
+                expect(tasks.length).to.equal(1)
+                expect(await tasks[0].get('name')).to.equal('review ceil painting looking for defects in all the corners without any exception bla bla bla bla bla bla bla bla')
+            })
+
             it('show greater time first')
             it('allow completion of recurrent tasks', async function(){
                 this.timeout(5000)

@@ -43,8 +43,7 @@ module.exports = async function({client, greaterFunction, selectFunction}){
                 }else if(response.text.includes("?")){
                     let options = response.reply_markup.inline_keyboard
                     let selectedOption = await selectOption(options[0][0], options[1][0])
-                    const callback = client.makeCallbackQuery(selectedOption.callback_data);
-                    await client.sendCallback(callback);
+                    await sendCallBack(selectedOption.callback_data)
                 }
             }
         },
@@ -70,16 +69,15 @@ module.exports = async function({client, greaterFunction, selectFunction}){
                     let selectedOption
                     if(await selectFunction(response.text)) selectedOption = options[0][0]
                     else selectedOption = options[0][1]
-                    const callback = client.makeCallbackQuery(selectedOption.callback_data);
-                    await client.sendCallback(callback);
+                    await sendCallBack(selectedOption.callback_data)
                 }
             }
         },
         addRecurrentTask: async function(name){
             await sendMessage("/recurrent")
-            await waitResponse()
+            await waitResponses()
             await sendMessage(name)
-            await waitResponse()
+            await waitResponses()
         },
         getRecurrentTasks: async function(){
             await sendMessage("/recurrent")
@@ -98,8 +96,7 @@ module.exports = async function({client, greaterFunction, selectFunction}){
                     complete: async function(){
                         //console.log('reply_markup', response.message.reply_markup)
                         let completeOption = response.message.reply_markup.inline_keyboard[0][0]
-                        const callback = client.makeCallbackQuery(completeOption.callback_data);
-                        await client.sendCallback(callback);
+                        await sendCallBack(completeOption.callback_data)
                     }
                 })
             }
@@ -117,5 +114,11 @@ module.exports = async function({client, greaterFunction, selectFunction}){
             //get all the recurrent tasks with their possible callbacks
             //call the callback for the one with the given name
         }
+    }
+
+    async function sendCallBack(data){
+        if (data.length > 55) throw new Error(`Trying to send a callback lenght greater than 55 allowed by current telegram API: ${data}`)
+        const callback = client.makeCallbackQuery(data);
+        await client.sendCallback(callback);
     }
 }
