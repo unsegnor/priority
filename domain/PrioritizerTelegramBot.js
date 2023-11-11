@@ -86,6 +86,37 @@ module.exports = {
             const botOptions = {polling: true, baseApiUrl: serverUrl};
             bot = new TelegramBot(token, botOptions);
 
+            async function showRecurrentTasksList(user, chatId){
+              //console.log('showing recurrent tasks')
+              let tasks = await user.getRecurrentTasks()
+              //console.log(`tasks: ${tasks}`)
+              if(tasks.length == 0){
+                bot.sendMessage(chatId, "No hay tareas recurrentes")
+                return
+              } 
+              for(let task of tasks){
+                let taskName = (await task.get('name')) 
+                let taskText = taskName +' desde hace ' + (await task.get('time since last completion'))
+                bot.sendMessage(chatId, `${taskText}`, {
+                  reply_markup: {
+                    inline_keyboard: [[
+                      {text: "Completar", callback_data: JSON.stringify({query_id:taskName, chatId, response: 'complete'})}
+                    ]]
+                  }
+                })
+              }
+            }
+
+            async function showList(user, chatId){
+              let tasks = await user.getTasks()
+              let tasksString = "Esta es tu lista ordenada: \n\n"
+              for(let task of tasks){
+                tasksString += task + "\n"
+              }
+            
+              bot.sendMessage(chatId, tasksString);
+            }
+
             bot.on('message', async (msg) => {
                 const chatId = msg.chat.id;
                 if(msg.text.startsWith('/version')) {
@@ -103,81 +134,43 @@ module.exports = {
                 
                 if(msg.text.startsWith('/completar')){
                   await user.completeTask()
-                  await showList()
+                  await showList(user, chatId)
                   return
                 }
 
                 if(msg.text.startsWith('/recurrent')){
                   userState[chatId] = "Waiting for recurrent task name"
-                  await showRecurrentTasksList()
-                  //await bot.sendMessage(chatId, "¿Cuál es el nombre de la tarea?")
-                  return
-                }
-
-                else{
-                  if(userState[chatId] == "Waiting for recurrent task name"){
-                    userState[chatId] = undefined
-                    await user.addRecurrentTask(msg.text)
-                    await showRecurrentTasksList()
-                  }else{
-                    await user.addTask(msg.text)
-                    await showList()
-                  }
+                  await showRecurrentTasksList(user, chatId)
                   return
                 }
                 
-                async function showList(){
-                  let tasks = await user.getTasks()
-                  let tasksString = "Esta es tu lista ordenada: \n\n"
-                  for(let task of tasks){
-                    tasksString += task + "\n"
-                  }
-                
-                  bot.sendMessage(chatId, tasksString);
+                if(userState[chatId] == "Waiting for recurrent task name"){
+                  userState[chatId] = undefined
+                  await user.addRecurrentTask(msg.text)
+                  await showRecurrentTasksList(user, chatId)
+                  return
                 }
 
-                async function showRecurrentTasksList(){
-                  //console.log('showing recurrent tasks')
-                  let tasks = await user.getRecurrentTasks()
-                  //console.log(`tasks: ${tasks}`)
-                  if(tasks.length == 0){
-                    bot.sendMessage(chatId, "No hay tareas recurrentes")
-                    return
-                  } 
-                  //let tasksString = "Tareas recurrentes: \n\n"
-                  for(let task of tasks){
-                    let taskName = (await task.get('name')) 
-                    let taskText = taskName +' desde hace ' + (await task.get('time since last completion'))
-                    bot.sendMessage(chatId, `${taskText}`, {
-                      reply_markup: {
-                        inline_keyboard: [[
-                          {text: "Completar", callback_data: JSON.stringify({query_id:taskName, chatId, response: 'complete'})}
-                        ]]
-                      }
-                    })
-                    //tasksString += (await task.get('name')) +' desde hace ' + (await task.get('time since last completion')) + "\n"
-                  }
-                
-                  //bot.sendMessage(chatId, tasksString);
-                }
-              });
+                  await user.addTask(msg.text)
+                  await showList(user, chatId)
+            });
 
-              bot.on('callback_query', async function(query){
-                //console.log(`received callback ${query.data}`)
-                const data = JSON.parse(query.data)
-                const chatId = data.chatId
-                const taskName = data.query_id
-                const action = data.response
+            bot.on('callback_query', async function(query){
+              //console.log(`received callback ${query.data}`)
+              const data = JSON.parse(query.data)
+              const chatId = data.chatId
+              const taskName = data.query_id
+              const action = data.response
 
-                if(action == 'complete'){
-                  let user = await prioritizer.getUser({
-                    id: chatId,
-                    greaterFunction: compareWhichTaskIsMoreImportant.bind(undefined, chatId),
-                    selectFunction: selectTask.bind(undefined, chatId)
-                  })
-                  await user.completeRecurrentTask(taskName)
-                }
-              })
+              if(action == 'complete'){
+                let user = await prioritizer.getUser({
+                  id: chatId,
+                  greaterFunction: compareWhichTaskIsMoreImportant.bind(undefined, chatId),
+                  selectFunction: selectTask.bind(undefined, chatId)
+                })
+                await user.completeRecurrentTask(taskName)
+              }
+            })
         }
     }
 }

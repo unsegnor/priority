@@ -36,43 +36,40 @@ module.exports = {
         }
 
         async function addRecurrentTask(name){
-            var task = await repository.getNew()
+            let task = await repository.getNew()
             task.set('name', name)
             task.set('creation time', new Date().toISOString())
             await user.add('recurrent tasks', task)
         }
 
         async function getRecurrentTasks(){
-            var tasks = await user.get('recurrent tasks')
+            let tasks = await user.get('recurrent tasks')
             if(!tasks) return []
-            for(var task of tasks){
-                var creationTime = await task.get('creation time')
+            for(let task of tasks){
+                let creationTime = await task.get('creation time')
                 let difference = obtenerDiferenciaEnFormatoLegible(new Date(creationTime), new Date())
-                let timeSinceLastCompletion = (new Date(new Date() - new Date(creationTime))).toISOString()
-                //console.log(`now ${new Date().toISOString()}`,`creation time ${creationTime}` ,`time since last completion ${timeSinceLastCompletion}`, `difference ${difference}`)
-                //console.log(await task.get('creation time'))
                 await task.set('time since last completion', difference)
             }
             return tasks
         }
 
         async function completeRecurrentTask(name){
-            var tasks = await user.get('recurrent tasks')
+            let tasks = await user.get('recurrent tasks')
             if(!tasks) return
-            for(var task of tasks){
+            for(let task of tasks){
                 if(await task.get('name') == name) await task.set('creation time', new Date().toISOString())
             }
         }
 
         function obtenerDiferenciaEnFormatoLegible(fecha1, fecha2) {
-            var diferenciaEnMilisegundos = Math.abs(fecha2 - fecha1);
+            let diferenciaEnMilisegundos = Math.abs(fecha2 - fecha1);
           
-            var segundos = Math.floor(diferenciaEnMilisegundos / 1000);
-            var minutos = Math.floor(segundos / 60);
-            var horas = Math.floor(minutos / 60);
-            var dias = Math.floor(horas / 24);
+            let segundos = Math.floor(diferenciaEnMilisegundos / 1000);
+            let minutos = Math.floor(segundos / 60);
+            let horas = Math.floor(minutos / 60);
+            let dias = Math.floor(horas / 24);
           
-            var tiempoRestante = '';
+            let tiempoRestante = '';
             if (dias > 0) {
               tiempoRestante += dias + ' días ';
               horas %= 24;
