@@ -15,6 +15,12 @@ module.exports = function(){
                 return (task.includes(selectedText))
             }
             user = await this.getUser(greaterFunction, selectFunction)
+
+            this.wait = async function (miliseconds){
+                return new Promise(function(resolve, reject){
+                    setTimeout(resolve,miliseconds)
+                })
+            }
         })
 
 
@@ -60,6 +66,73 @@ module.exports = function(){
                 expect(tasks.length).to.equal(2)
                 expect(tasks[0]).to.equal('3 clean up')
                 expect(tasks[1]).to.equal('1 go shopping')
+            })
+        })
+
+        describe('reucurrent tasks', function(){
+            it('creates a recurrent task', async function(){
+                await user.addRecurrentTask('do heater maintenance')
+                var tasks = await user.getRecurrentTasks();
+                expect(tasks.length).to.equal(1)
+                expect(await tasks[0].get('name')).to.equal('do heater maintenance')
+            })
+
+            it('returns empty array when no recurrent tasks were created', async function(){
+                var tasks = await user.getRecurrentTasks();
+                expect(tasks.length).to.equal(0)
+            })
+
+            it('show time since recurrent task creation', async function(){
+                this.timeout(10000)
+                await user.addRecurrentTask('do heater maintenance')
+                await this.wait(1000)
+                var tasks = await user.getRecurrentTasks();
+                expect(tasks.length).to.equal(1)
+                expect(await tasks[0].get('name')).to.equal('do heater maintenance')
+                expect(await tasks[0].get('time since last completion')).to.equal('1 segundos')
+            })
+
+            it('show time since recurrent task creation', async function(){
+                this.timeout(10000)
+                await user.addRecurrentTask('do heater maintenance')
+                await this.wait(2000)
+                var tasks = await user.getRecurrentTasks();
+                expect(tasks.length).to.equal(1)
+                expect(await tasks[0].get('name')).to.equal('do heater maintenance')
+                expect(await tasks[0].get('time since last completion')).to.equal('2 segundos')
+            })
+
+            it('show 0 seconds when was immediately created', async function(){
+                await user.addRecurrentTask('do heater maintenance')
+                var tasks = await user.getRecurrentTasks();
+                expect(tasks.length).to.equal(1)
+                expect(await tasks[0].get('name')).to.equal('do heater maintenance')
+                expect(await tasks[0].get('time since last completion')).to.equal('0 segundos')
+            })
+
+            it('shows hours', async function(){
+                //TODO: implement time travel
+                // await user.addRecurrentTask('do heater maintenance')
+                // await this.wait(2000)
+                // var tasks = await user.getRecurrentTasks();
+                // expect(tasks.length).to.equal(1)
+                // expect(await tasks[0].get('name')).to.equal('do heater maintenance')
+                // expect(await tasks[0].get('time since last completion')).to.equal('2 segundos')
+            })
+
+            it('add several recurrent tasks')
+            it('show greater time first')
+            it('allow completion of recurrent tasks', async function(){
+                this.timeout(5000)
+                await user.addRecurrentTask('heater maintenance')
+                await this.wait(1500)
+                await user.completeRecurrentTask('heater maintenance')
+                await this.wait(1500)
+
+                var tasks = await user.getRecurrentTasks();
+                expect(tasks.length).to.equal(1)
+                expect(await tasks[0].get('name')).to.equal('heater maintenance')
+                expect(await tasks[0].get('time since last completion')).to.equal('1 segundos')
             })
         })
     })

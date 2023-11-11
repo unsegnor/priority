@@ -10,6 +10,7 @@ module.exports = async function({client, greaterFunction, selectFunction}){
     }
 
     async function sendMessage(message){
+        //console.log(`Sending message ${message}`)
         const msg = client.makeMessage(message);
         await client.sendMessage(msg);
     }
@@ -20,7 +21,13 @@ module.exports = async function({client, greaterFunction, selectFunction}){
         return updates.result[0].message
     }
 
+    async function waitResponses(){
+        const updates = await client.getUpdates();
+        return updates.result
+    }
+
     let tasksList = []
+    //let recurrentTasks = []
 
     await startBot()
     return {
@@ -67,6 +74,48 @@ module.exports = async function({client, greaterFunction, selectFunction}){
                     await client.sendCallback(callback);
                 }
             }
+        },
+        addRecurrentTask: async function(name){
+            await sendMessage("/recurrent")
+            await waitResponse()
+            await sendMessage(name)
+            await waitResponse()
+        },
+        getRecurrentTasks: async function(){
+            await sendMessage("/recurrent")
+            let responses = await waitResponses()
+            //console.log('responses', responses)
+            let recurrentTasks = []
+            if(responses[0].message.text == "No hay tareas recurrentes") return []
+            for(let response of responses){
+                let taskText = response.message.text
+                let taskProperties = taskText.split(' desde hace ')
+                recurrentTasks.push({
+                    get: async function(property){
+                        if(property == 'name') return taskProperties[0]
+                        else return taskProperties[1]
+                    },
+                    complete: async function(){
+                        //console.log('reply_markup', response.message.reply_markup)
+                        let completeOption = response.message.reply_markup.inline_keyboard[0][0]
+                        const callback = client.makeCallbackQuery(completeOption.callback_data);
+                        await client.sendCallback(callback);
+                    }
+                })
+            }
+            return recurrentTasks
+        },
+        completeRecurrentTask: async function(name){
+            let recurrentTasks = await this.getRecurrentTasks()
+            //console.log('complete recurrent task', name)
+            //console.log('recurrent tasks', JSON.stringify(recurrentTasks))
+            for(let task of recurrentTasks){
+                let taskName = await task.get('name')
+                console.log('task name', taskName)
+                if((await task.get('name')) == name) await task.complete()
+            }
+            //get all the recurrent tasks with their possible callbacks
+            //call the callback for the one with the given name
         }
     }
 }

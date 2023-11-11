@@ -6,6 +6,9 @@ const Prioritizer = require("../index.js")
 const { nanoid } = require('nanoid');
 const packageJson = require('../package.json')
 
+
+let userState = {}
+
 module.exports = {
     createNew: async function(repository, token){
         const prioritizer = Prioritizer.createNew(repository)
@@ -100,18 +103,81 @@ module.exports = {
                 
                 if(msg.text.startsWith('/completar')){
                   await user.completeTask()
-                }else{
-                  await user.addTask(msg.text)
+                  await showList()
+                  return
+                }
+
+                if(msg.text.startsWith('/recurrent')){
+                  userState[chatId] = "Waiting for recurrent task name"
+                  await showRecurrentTasksList()
+                  //await bot.sendMessage(chatId, "¿Cuál es el nombre de la tarea?")
+                  return
+                }
+
+                else{
+                  if(userState[chatId] == "Waiting for recurrent task name"){
+                    userState[chatId] = undefined
+                    await user.addRecurrentTask(msg.text)
+                    await showRecurrentTasksList()
+                  }else{
+                    await user.addTask(msg.text)
+                    await showList()
+                  }
+                  return
                 }
                 
-                let tasks = await user.getTasks()
-                let tasksString = "Esta es tu lista ordenada: \n\n"
-                for(let task of tasks){
-                  tasksString += task + "\n"
+                async function showList(){
+                  let tasks = await user.getTasks()
+                  let tasksString = "Esta es tu lista ordenada: \n\n"
+                  for(let task of tasks){
+                    tasksString += task + "\n"
+                  }
+                
+                  bot.sendMessage(chatId, tasksString);
                 }
-              
-                bot.sendMessage(chatId, tasksString);
+
+                async function showRecurrentTasksList(){
+                  //console.log('showing recurrent tasks')
+                  let tasks = await user.getRecurrentTasks()
+                  //console.log(`tasks: ${tasks}`)
+                  if(tasks.length == 0){
+                    bot.sendMessage(chatId, "No hay tareas recurrentes")
+                    return
+                  } 
+                  //let tasksString = "Tareas recurrentes: \n\n"
+                  for(let task of tasks){
+                    let taskName = (await task.get('name')) 
+                    let taskText = taskName +' desde hace ' + (await task.get('time since last completion'))
+                    bot.sendMessage(chatId, `${taskText}`, {
+                      reply_markup: {
+                        inline_keyboard: [[
+                          {text: "Completar", callback_data: JSON.stringify({query_id:taskName, chatId, response: 'complete'})}
+                        ]]
+                      }
+                    })
+                    //tasksString += (await task.get('name')) +' desde hace ' + (await task.get('time since last completion')) + "\n"
+                  }
+                
+                  //bot.sendMessage(chatId, tasksString);
+                }
               });
+
+              bot.on('callback_query', async function(query){
+                //console.log(`received callback ${query.data}`)
+                const data = JSON.parse(query.data)
+                const chatId = data.chatId
+                const taskName = data.query_id
+                const action = data.response
+
+                if(action == 'complete'){
+                  let user = await prioritizer.getUser({
+                    id: chatId,
+                    greaterFunction: compareWhichTaskIsMoreImportant.bind(undefined, chatId),
+                    selectFunction: selectTask.bind(undefined, chatId)
+                  })
+                  await user.completeRecurrentTask(taskName)
+                }
+              })
         }
     }
 }
