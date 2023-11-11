@@ -103,12 +103,14 @@ module.exports = {
                 taskName,
                 translateAction: function(actionId){
                   if (actionId == 'c') return 'complete'
+                  if (actionId == 'r') return 'remove'
                 }
               }
               bot.sendMessage(chatId, `${taskText}`, {
                 reply_markup: {
                   inline_keyboard: [[
-                    {text: "Completar", callback_data: JSON.stringify({query_id, r:'c'})}
+                    {text: "Completar", callback_data: JSON.stringify({query_id, r:'c'})},
+                    {text: "Eliminar", callback_data: JSON.stringify({query_id, r:'r'})}
                   ]]
                 }
               })
@@ -183,6 +185,15 @@ module.exports = {
                   selectFunction: selectTask.bind(undefined, chatId)
                 })
                 await user.completeRecurrentTask(taskName)
+              }
+
+              if(action == 'remove'){
+                let user = await prioritizer.getUser({
+                  id: chatId,
+                  greaterFunction: compareWhichTaskIsMoreImportant.bind(undefined, chatId),
+                  selectFunction: selectTask.bind(undefined, chatId)
+                })
+                await user.removeRecurrentTask(taskName)
               }
             })
         }
