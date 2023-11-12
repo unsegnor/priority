@@ -2,8 +2,8 @@ git fetch
 git reset --hard
 git pull
 
-# Load nvm
-export NVM_DIR="$([ -z "${XDG_CONFIG_HOME-}" ] && printf %s "${HOME}/.nvm" || printf %s "${XDG_CONFIG_HOME}/nvm")"
+# Load nvm. NVM_PATH variable must be defined in the environment or before running (eg. export NVM_PATH="/home/pi/.config/nvm")
+export NVM_DIR="$NVM_PATH"
 [ -s "$NVM_DIR/nvm.sh" ] && \. "$NVM_DIR/nvm.sh"
 
 nvm install
