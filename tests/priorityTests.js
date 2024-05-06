@@ -1,8 +1,9 @@
 const { expect } = require("chai")
+const timeKeeper = require('timekeeper')
 
-module.exports = function(){
+module.exports = function({fastSetup}){
     describe('priority tests', function(){
-        let user, selectedText
+        let user, time, selectedText
 
         beforeEach(async function(){
             selectedText = undefined
@@ -14,8 +15,17 @@ module.exports = function(){
             async function selectFunction(task){
                 return (task.includes(selectedText))
             }
-            user = await this.getUser(greaterFunction, selectFunction)
+            time = {
+                advance: async function({seconds}){
+                    console.log('before travel', new Date())
+                    let now = new Date()
+                    timeKeeper.freeze(now)
+                    timeKeeper.travel(now + (seconds * 1000))
 
+                    console.log('after travel', new Date())
+                }
+            }
+            user = await this.getUser(greaterFunction, selectFunction)
             this.wait = async function (miliseconds){
                 return new Promise(function(resolve, reject){
                     setTimeout(resolve,miliseconds)
@@ -23,6 +33,14 @@ module.exports = function(){
             }
         })
 
+        afterEach(async function(){
+            timeKeeper.reset()
+        })
+        //TODO: cómo seleccionar qué tests queremos ejecutar en qué interfaz? hay que hacer que los tests sean first class citizens
+        //first class citizens en Object Oriented Programming es que los tests son clases, y como clases tienen propiedades,
+        //una de ellas puede ser en qué interfaces queremos ejecutarlos
+        //así también ganamos control sobre qué tests ejecutamos y cuándo, pudiendo implementar estrategias de optimización como Test Impact Analysis
+        //mantener un historial de ejecuciones, ejecutándolos de formas diferentes (introducir modificaciones entre Act y Assert o entre Arrange y Act)
 
         describe('Introducing tasks', async function(){
             it('introducing a task', async function(){
@@ -110,15 +128,18 @@ module.exports = function(){
                 expect(await tasks[0].get('time since last completion')).to.equal('0 segundos')
             })
 
-            it('shows hours', async function(){
-                //TODO: implement time travel
-                // await user.addRecurrentTask('do heater maintenance')
-                // await this.wait(2000)
-                // let tasks = await user.getRecurrentTasks();
-                // expect(tasks.length).to.equal(1)
-                // expect(await tasks[0].get('name')).to.equal('do heater maintenance')
-                // expect(await tasks[0].get('time since last completion')).to.equal('2 segundos')
-            })
+            if(fastSetup){
+                it.only('shows hours', async function(){
+                    await user.addRecurrentTask('do heater maintenance')
+                    await time.advance({
+                        seconds: 30
+                    })
+                    let tasks = await user.getRecurrentTasks();
+                    expect(tasks.length).to.equal(1)
+                    expect(await tasks[0].get('name')).to.equal('do heater maintenance')
+                    expect(await tasks[0].get('time since last completion')).to.equal('30 segundos')
+                })
+            }
 
             it('add several recurrent tasks', async function(){
                 this.timeout(10000)

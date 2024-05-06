@@ -31,7 +31,7 @@ describe('Telegram bot tests', function(){
         await telegramServer.stop()
     })
 
-    PriorityTests()
+    PriorityTests({fastSetup: false})
 
     it('getting the version of the bot', async function(){
         let user = await this.getUser('1')
