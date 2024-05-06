@@ -1,5 +1,13 @@
 const { expect } = require("chai")
 
+//TODO: create a way to start the test in a version and update to the next version during the execution
+// we need to decide how to know when to update
+//we could make explicit the arrange, act and assert parts of the test and use them
+//or we could detect calls to user class and use them
+
+//we also need to set a way to execute code from the previous version in the first part of the test
+//could be getting the previous version in a subfolder, or actually changing the source files back and forth as javascript is interpreted
+
 module.exports = function(){
     describe('priority tests', function(){
         let user, selectedText
