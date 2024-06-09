@@ -8,6 +8,11 @@ const { expect } = require("chai")
 //we also need to set a way to execute code from the previous version in the first part of the test
 //could be getting the previous version in a subfolder, or actually changing the source files back and forth as javascript is interpreted
 
+//we could create an UpdateUser that will load both versions of the software then chooses which one to run depending on the state (before or after updating)
+//we could have a SpyUser that runs the tests but saves all the calls that are done to user
+//or analyze the code of the test looking for calls to any User method
+//we need to save information about the tests that will be used in later executions
+
 module.exports = function(){
     describe('priority tests', function(){
         let user, selectedText
