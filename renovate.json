@@ -1,4 +1,5 @@
 {
+  "extends": ["group:stryker-jsMonorepo"],
   "automerge": true,
   "nvm": true
 }
