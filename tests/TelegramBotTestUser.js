@@ -112,49 +112,20 @@ module.exports = async function({client, greaterFunction, selectFunction}){
             return recurrentTasks
         },
         completeRecurrentTask: async function(name){
-            // Usar el método directo sin llamar a getRecurrentTasks primero
-            // para evitar interferencias con el time travelling
-            await sendMessage("/recurrent")
-            let responses = await waitResponses()
-            
-            if(responses.length === 0 || responses[0].message.text === "No hay tareas recurrentes") {
-                throw new Error("No recurrent tasks found to complete")
+            let recurrentTasks = await this.getRecurrentTasks()
+            for(let task of recurrentTasks){
+                let taskName = await task.get('name')
+                console.log('task name', taskName)
+                if((await task.get('name')) == name) await task.complete()
             }
-            
-            for(let response of responses){
-                let taskText = response.message.text
-                let taskProperties = taskText.split(' desde hace ')
-                let taskName = taskProperties[0]
-                
-                if(taskName === name) {
-                    let completeOption = response.message.reply_markup.inline_keyboard[0][0]
-                    await sendCallBack(completeOption.callback_data)
-                    return
-                }
-            }
-            throw new Error(`Recurrent task '${name}' not found`)
         },
         removeRecurrentTask: async function(name){
-            // Usar el método directo para consistencia
-            await sendMessage("/recurrent")
-            let responses = await waitResponses()
-            
-            if(responses.length === 0 || responses[0].message.text === "No hay tareas recurrentes") {
-                throw new Error("No recurrent tasks found to remove")
+            let recurrentTasks = await this.getRecurrentTasks()
+            for(let task of recurrentTasks){
+                let taskName = await task.get('name')
+                console.log('task name', taskName)
+                if((await task.get('name')) == name) await task.remove()
             }
-            
-            for(let response of responses){
-                let taskText = response.message.text
-                let taskProperties = taskText.split(' desde hace ')
-                let taskName = taskProperties[0]
-                
-                if(taskName === name) {
-                    let removeOption = response.message.reply_markup.inline_keyboard[0][1]
-                    await sendCallBack(removeOption.callback_data)
-                    return
-                }
-            }
-            throw new Error(`Recurrent task '${name}' not found`)
         }
     }
 
