@@ -77,7 +77,12 @@ module.exports = async function({client, greaterFunction, selectFunction}){
             await sendMessage("/recurrent")
             await waitResponses()
             await sendMessage(name)
-            await waitResponses()
+            let finalResponses = await waitResponses()
+            // Asegurar que la operación se complete correctamente
+            // esperando a que aparezca la nueva tarea en la lista
+            if(finalResponses.length === 0 || finalResponses[0].message.text === "No hay tareas recurrentes") {
+                throw new Error("Failed to add recurrent task: " + name)
+            }
         },
         getRecurrentTasks: async function(){
             await sendMessage("/recurrent")
@@ -108,15 +113,11 @@ module.exports = async function({client, greaterFunction, selectFunction}){
         },
         completeRecurrentTask: async function(name){
             let recurrentTasks = await this.getRecurrentTasks()
-            //console.log('complete recurrent task', name)
-            //console.log('recurrent tasks', JSON.stringify(recurrentTasks))
             for(let task of recurrentTasks){
                 let taskName = await task.get('name')
                 console.log('task name', taskName)
                 if((await task.get('name')) == name) await task.complete()
             }
-            //get all the recurrent tasks with their possible callbacks
-            //call the callback for the one with the given name
         },
         removeRecurrentTask: async function(name){
             let recurrentTasks = await this.getRecurrentTasks()

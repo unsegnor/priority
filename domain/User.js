@@ -1,7 +1,7 @@
 const PrioritizedList = require("./PrioritizedList")
 
 module.exports = {
-    create: async function({id, greaterFunction, repository, selectFunction}){
+    create: async function({id, greaterFunction, repository, selectFunction, timeController}){
         let user = await repository.getRoot(`user-${id}`)
         let list = await PrioritizedList.getPersistentPrioritizedList(greaterFunction, id, repository)
         return {
@@ -39,7 +39,7 @@ module.exports = {
         async function addRecurrentTask(name){
             let task = await repository.getNew()
             task.set('name', name)
-            task.set('creation time', new Date().toISOString())
+            task.set('creation time', timeController.now().toISOString())
             await user.add('recurrent tasks', task)
         }
 
@@ -50,7 +50,7 @@ module.exports = {
             for(let task of tasks){
                 if(await task.get('status') != 'removed'){
                     let creationTime = await task.get('creation time')
-                    let difference = obtenerDiferenciaEnFormatoLegible(new Date(creationTime), new Date())
+                    let difference = obtenerDiferenciaEnFormatoLegible(new Date(creationTime), timeController.now())
                     await task.set('time since last completion', difference)
                     notRemovedTasks.push(task)
                 }
@@ -62,7 +62,7 @@ module.exports = {
             let tasks = await user.get('recurrent tasks')
             if(!tasks) return
             for(let task of tasks){
-                if(await task.get('name') == name) await task.set('creation time', new Date().toISOString())
+                if(await task.get('name') == name) await task.set('creation time', timeController.now().toISOString())
             }
         }
 
@@ -76,30 +76,32 @@ module.exports = {
 
         function obtenerDiferenciaEnFormatoLegible(fecha1, fecha2) {
             let diferenciaEnMilisegundos = Math.abs(fecha2 - fecha1);
+            
+            if(diferenciaEnMilisegundos < 1000) return '0 segundos'
           
             let segundos = Math.floor(diferenciaEnMilisegundos / 1000);
             let minutos = Math.floor(segundos / 60);
             let horas = Math.floor(minutos / 60);
             let dias = Math.floor(horas / 24);
+            
+            // Aplicar módulos para obtener las partes restantes
+            horas %= 24;
+            minutos %= 60;
+            segundos %= 60;
           
             let tiempoRestante = '';
             if (dias > 0) {
               tiempoRestante += dias + ' días ';
-              horas %= 24;
             }
             if (horas > 0) {
               tiempoRestante += horas + ' horas ';
-              minutos %= 60;
             }
             if (minutos > 0) {
               tiempoRestante += minutos + ' minutos ';
-              segundos %= 60;
             }
             if (segundos > 0) {
               tiempoRestante += segundos + ' segundos ';
             }
-
-            if(diferenciaEnMilisegundos < 1000) return '0 segundos'
           
             return tiempoRestante.trim();
           }
