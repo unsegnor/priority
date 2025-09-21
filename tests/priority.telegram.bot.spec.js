@@ -25,10 +25,6 @@ describe('Telegram bot tests', function(){
                 selectFunction
             })
         }
-        
-        // Deshabilitar time travelling para tests del bot de Telegram
-        // Los tests del bot necesitan timing real para la comunicación simulada
-        timeController.disableTimeTravel()
     })
 
     afterEach(async function(){
