@@ -5,6 +5,7 @@ const PrioritizerTelegramBot = require('../domain/PrioritizerTelegramBot')
 const TelegramBotTestUser = require('./TelegramBotTestUser')
 const FakeTelegramServer = require('./FakeTelegramServer')
 const packageJson = require('../package.json')
+const timeController = require('../domain/TimeController')
 
 describe('Telegram bot tests', function(){
     let telegramServer, bot
@@ -24,6 +25,10 @@ describe('Telegram bot tests', function(){
                 selectFunction
             })
         }
+        
+        // Deshabilitar time travelling para tests del bot de Telegram
+        // Los tests del bot necesitan timing real para la comunicación simulada
+        timeController.disableTimeTravel()
     })
 
     afterEach(async function(){

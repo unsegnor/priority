@@ -1,4 +1,5 @@
 const { expect } = require("chai")
+const timeController = require('../domain/TimeController')
 
 module.exports = function(){
     describe('priority tests', function(){
@@ -6,6 +7,10 @@ module.exports = function(){
 
         beforeEach(async function(){
             selectedText = undefined
+            
+            // Habilitar time travelling al inicio de cada test
+            timeController.enableTimeTravel()
+            
             async function greaterFunction(task1, task2){
                 if (task1 > task2) return task1;
                 if (task2 > task1) return task2;
@@ -17,12 +22,23 @@ module.exports = function(){
             user = await this.getUser(greaterFunction, selectFunction)
 
             this.wait = async function (miliseconds){
-                return new Promise(function(resolve, reject){
-                    setTimeout(resolve,miliseconds)
-                })
+                if (timeController.isTimeTravelEnabled) {
+                    // Time travelling: avanzar tiempo simulado instantáneamente
+                    timeController.advance(miliseconds)
+                    return Promise.resolve()
+                } else {
+                    // Fallback a espera real si time travel está deshabilitado
+                    return new Promise(function(resolve, reject){
+                        setTimeout(resolve, miliseconds)
+                    })
+                }
             }
         })
 
+        afterEach(async function(){
+            // Deshabilitar time travelling después de cada test
+            timeController.disableTimeTravel()
+        })
 
         describe('Introducing tasks', async function(){
             it('introducing a task', async function(){
@@ -111,13 +127,31 @@ module.exports = function(){
             })
 
             it('shows hours', async function(){
-                //TODO: implement time travel
-                // await user.addRecurrentTask('do heater maintenance')
-                // await this.wait(2000)
-                // let tasks = await user.getRecurrentTasks();
-                // expect(tasks.length).to.equal(1)
-                // expect(await tasks[0].get('name')).to.equal('do heater maintenance')
-                // expect(await tasks[0].get('time since last completion')).to.equal('2 segundos')
+                await user.addRecurrentTask('do heater maintenance')
+                await this.wait(3600000) // 1 hora en milisegundos
+                let tasks = await user.getRecurrentTasks();
+                expect(tasks.length).to.equal(1)
+                expect(await tasks[0].get('name')).to.equal('do heater maintenance')
+                expect(await tasks[0].get('time since last completion')).to.equal('1 horas')
+            })
+
+            it('shows days', async function(){
+                await user.addRecurrentTask('do heater maintenance')
+                await this.wait(86400000) // 1 día en milisegundos
+                let tasks = await user.getRecurrentTasks();
+                expect(tasks.length).to.equal(1)
+                expect(await tasks[0].get('name')).to.equal('do heater maintenance')
+                expect(await tasks[0].get('time since last completion')).to.equal('1 días')
+            })
+
+            it('shows complex time with days, hours, minutes and seconds', async function(){
+                await user.addRecurrentTask('do heater maintenance')
+                // 1 día + 2 horas + 3 minutos + 4 segundos
+                await this.wait(86400000 + 7200000 + 180000 + 4000)
+                let tasks = await user.getRecurrentTasks();
+                expect(tasks.length).to.equal(1)
+                expect(await tasks[0].get('name')).to.equal('do heater maintenance')
+                expect(await tasks[0].get('time since last completion')).to.equal('1 días 2 horas 3 minutos 4 segundos')
             })
 
             it('add several recurrent tasks', async function(){
