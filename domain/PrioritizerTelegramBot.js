@@ -141,7 +141,7 @@ module.exports = {
                 if(msg.text.startsWith('/start')) return
                 
                 let user = await prioritizer.getUser({
-                    id: chatId,
+                    id: String(chatId),
                     greaterFunction: compareWhichTaskIsMoreImportant.bind(undefined, chatId),
                     selectFunction: selectTask.bind(undefined, chatId)
                   })
@@ -180,7 +180,7 @@ module.exports = {
 
               if(action == 'complete'){
                 let user = await prioritizer.getUser({
-                  id: chatId,
+                  id: String(chatId),
                   greaterFunction: compareWhichTaskIsMoreImportant.bind(undefined, chatId),
                   selectFunction: selectTask.bind(undefined, chatId)
                 })
@@ -189,7 +189,7 @@ module.exports = {
 
               if(action == 'remove'){
                 let user = await prioritizer.getUser({
-                  id: chatId,
+                  id: String(chatId),
                   greaterFunction: compareWhichTaskIsMoreImportant.bind(undefined, chatId),
                   selectFunction: selectTask.bind(undefined, chatId)
                 })
