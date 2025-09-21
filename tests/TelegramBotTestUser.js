@@ -75,7 +75,7 @@ module.exports = async function({client, greaterFunction, selectFunction}){
         },
         addRecurrentTask: async function(name){
             await sendMessage("/recurrent")
-            let initialResponses = await waitResponses()
+            await waitResponses()
             await sendMessage(name)
             let finalResponses = await waitResponses()
             // Asegurar que la operación se complete correctamente
