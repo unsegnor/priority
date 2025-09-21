@@ -1,12 +1,14 @@
 const { expect } = require("chai")
-const timeController = require('../domain/TimeController')
 
 module.exports = function(){
     describe('priority tests', function(){
-        let user, selectedText
+        let user, selectedText, timeController
 
         beforeEach(async function(){
             selectedText = undefined
+            
+            // Obtener el timeController desde el contexto del test
+            timeController = this.timeController
             
             // Habilitar time travelling al inicio de cada test
             timeController.enableTimeTravel()
@@ -19,19 +21,12 @@ module.exports = function(){
             async function selectFunction(task){
                 return (task.includes(selectedText))
             }
+            
             user = await this.getUser(greaterFunction, selectFunction)
 
+            // Método wait simplificado: delega toda la lógica al timeController
             this.wait = async function (miliseconds){
-                if (timeController.isTimeTravelEnabled) {
-                    // Time travelling: avanzar tiempo simulado instantáneamente
-                    timeController.advance(miliseconds)
-                    return Promise.resolve()
-                } else {
-                    // Fallback a espera real si time travel está deshabilitado
-                    return new Promise(function(resolve, reject){
-                        setTimeout(resolve, miliseconds)
-                    })
-                }
+                return timeController.advance(miliseconds)
             }
         })
 
@@ -85,7 +80,7 @@ module.exports = function(){
             })
         })
 
-        describe('reucurrent tasks', function(){
+        describe('recurrent tasks', function(){
             it('creates a recurrent task', async function(){
                 await user.addRecurrentTask('do heater maintenance')
                 let tasks = await user.getRecurrentTasks();

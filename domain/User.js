@@ -1,8 +1,7 @@
 const PrioritizedList = require("./PrioritizedList")
-const timeController = require("./TimeController")
 
 module.exports = {
-    create: async function({id, greaterFunction, repository, selectFunction}){
+    create: async function({id, greaterFunction, repository, selectFunction, timeController}){
         let user = await repository.getRoot(`user-${id}`)
         let list = await PrioritizedList.getPersistentPrioritizedList(greaterFunction, id, repository)
         return {

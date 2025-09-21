@@ -14,8 +14,8 @@ let userState = {}
 let queryDataById = {} 
 
 module.exports = {
-    createNew: async function(repository, token){
-        const prioritizer = Prioritizer.createNew(repository)
+    createNew: async function(repository, token, timeController){
+        const prioritizer = Prioritizer.createNew(repository, timeController)
         let serverUrl = undefined
         let bot
         return {

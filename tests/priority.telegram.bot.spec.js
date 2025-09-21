@@ -5,18 +5,23 @@ const PrioritizerTelegramBot = require('../domain/PrioritizerTelegramBot')
 const TelegramBotTestUser = require('./TelegramBotTestUser')
 const FakeTelegramServer = require('./FakeTelegramServer')
 const packageJson = require('../package.json')
-const timeController = require('../domain/TimeController')
+const TimeController = require('../domain/TimeController')
 
 describe('Telegram bot tests', function(){
-    let telegramServer, bot
+    let telegramServer, bot, timeController
 
     beforeEach(async function(){
+        timeController = new TimeController()
+        
         telegramServer = FakeTelegramServer()
         await telegramServer.start()
 
-        bot = await PrioritizerTelegramBot.createNew(TestRepository(), telegramServer.getToken())
+        bot = await PrioritizerTelegramBot.createNew(TestRepository(), telegramServer.getToken(), timeController)
         bot.setTelegramServerURL(telegramServer.getUrl())
         await bot.start()
+
+        // Inyectar timeController en el contexto del test
+        this.timeController = timeController
 
         this.getUser = async function(greaterFunction, selectFunction){
             return TelegramBotTestUser({

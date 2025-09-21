@@ -8,9 +8,15 @@ class TimeController {
         return this.isTimeTravelEnabled ? new Date(this.currentTime) : new Date()
     }
     
-    advance(milliseconds) {
+    async advance(milliseconds) {
         if (this.isTimeTravelEnabled) {
             this.currentTime = new Date(this.currentTime.getTime() + milliseconds)
+            return Promise.resolve()
+        } else {
+            // Espera real cuando time travel está deshabilitado
+            return new Promise(resolve => {
+                setTimeout(resolve, milliseconds)
+            })
         }
     }
     
@@ -30,4 +36,5 @@ class TimeController {
     }
 }
 
-module.exports = new TimeController()
+// Crear instancia para inyección
+module.exports = TimeController
