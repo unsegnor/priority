@@ -47,7 +47,7 @@
     "dotenv": "^17.0.0",
     "nanoid": "^5.0.0",
     "node-persist": "^4.0.0",
-    "node-telegram-bot-api": "^0.66.0",
+    "node-telegram-bot-api": "^0.67.0",
     "persistent-programming": "^3.1.24",
     "persistent-programming-redis-state": "^3.0.19",
     "telegram-test-api": "^4.2.1"
