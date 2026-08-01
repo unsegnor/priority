@@ -45,7 +45,7 @@
   "homepage": "https://github.com/unsegnor/priority#readme",
   "dependencies": {
     "dotenv": "^17.0.0",
-    "nanoid": "^5.0.0",
+    "nanoid": "^6.0.0",
     "node-persist": "^4.0.0",
     "node-telegram-bot-api": "^0.67.0",
     "persistent-programming": "^3.1.24",
